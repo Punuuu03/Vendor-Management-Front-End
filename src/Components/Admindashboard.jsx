@@ -24,21 +24,23 @@ const Sidebar = ({ onNavigate }) => {
   };
 
   return (
-    <div className="w-1/5 bg-[#1e293b] text-white shadow-lg p-4 min-h-screen">
-      <div className="flex items-center mb-6">
-        <img
-          src="https://content.jdmagicbox.com/v2/comp/kolkata/b1/033pxx33.xx33.231201170458.u4b1/catalogue/bharatmala-seva-bharati-kolkata-81j6t16kev.jpg"
-          alt="Logo"
-          className="h-12 w-12 mr-3 rounded-full"
-        />
-        <h1 className="text-xl font-bold">Vendor Management</h1>
-      </div>
+    <div className="w-1/5 bg-[#00234E] text-white shadow-lg p-4 min-h-screen">
+     <div className="flex flex-col items-center mb-6">
+  <img
+    src="logo.png"
+    alt="Logo"
+    className="h-20 w-20 mb-2 rounded-full"
+  />
+  <h1 className="text-xl font-bold">Vendor Management</h1>
+</div>
+
       <nav className="mt-6">
         <ul>
           {[
-            { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
-            { icon: <FaList />, label: "Subcategory", path: "/subcategory" },
-            { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributor-credentials" },
+            { icon: <FaPlus/>, label: "Dashboard", path: "/Adashinner"},
+          { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
+            { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
+            { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" },
             { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" },
             { icon: <FaFileAlt />, label: "Verify Documents", path: "/Verifydocuments" },
             { icon: <FaTasks />, label: "Distributor Assign", path: "/distributor-assign" },
@@ -46,7 +48,7 @@ const Sidebar = ({ onNavigate }) => {
             <li
               key={index}
               className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 shadow-md ${
-                activePath === item.path ? "bg-white text-black border-l-4 border-blue-500" : "bg-gray-700 hover:bg-gray-600"
+                activePath === item.path ? "bg-white text-black border-l-4 border-blue-600" : "bg-gray-600 hover:bg-gray-400"
               }`}
               onClick={() => handleNavigation(item.path)}
             >
@@ -90,7 +92,7 @@ const AdminDashboard = ({ children }) => {
       <Sidebar onNavigate={(path) => navigate(path)} />
       <div className="flex-1 p-6">
         {/* Top Section */}
-        <div className="flex items-center justify-between bg-[#334155] text-white p-4 rounded-md shadow-md">
+        <div className="flex items-center justify-between bg-[#00234E] text-white p-4 rounded-md shadow-md">
           <span className="text-lg font-bold">Admin Dashboard</span>
 
           {/* Profile Section */}

@@ -1,8 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCheckCircle, FaUserShield, FaFileAlt } from "react-icons/fa";
 
+const iconMapping = {
+  Passport: <FaFileAlt />,
+  "Driving License": <FaUserShield />,
+};
+
 const Home = () => {
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/document-types")
+      .then((res) => res.json())
+      .then((data) => setServices(data))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+
   return (
     <div className="bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn">
       {/* Hero Section */}
@@ -18,25 +32,22 @@ const Home = () => {
         </Link>
       </section>
 
-      {/* Services Section */}
+      {/* Services Section (Dynamic API Data) */}
       <section className="py-12 px-6 bg-white">
         <h2 className="text-3xl font-bold text-center mb-8 text-[#1e293b]">Our Services</h2>
         <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          <ServiceCard
-            icon={<FaFileAlt />}
-            title="Aadhar Card"
-            description="Apply for a new Aadhar Card or update details easily."
-          />
-          <ServiceCard
-            icon={<FaUserShield />}
-            title="PAN Card"
-            description="Get your Permanent Account Number (PAN) hassle-free."
-          />
-          <ServiceCard
-            icon={<FaCheckCircle />}
-            title="Income Certificate"
-            description="Apply for an Income Certificate for legal and financial purposes."
-          />
+          {services.length > 0 ? (
+            services.map((service) => (
+              <ServiceCard
+                key={service.doc_type_id}
+                icon={iconMapping[service.doc_type_name] || <FaCheckCircle />}
+                title={service.doc_type_name}
+                description={`Apply for a ${service.doc_type_name} easily.`}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500">Loading services...</p>
+          )}
         </div>
       </section>
 

@@ -7,22 +7,60 @@ const imageUrl =
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
-    role: "customer",
+    phone: "",
+    role: "Customer", // Default role is Customer
   });
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+  
+    // Ensure phone number is only digits and max 10 characters
+    if (name === "phone") {
+      if (!/^\d*$/.test(value)) return; // Prevent non-numeric input
+      if (value.length > 10) return; // Prevent more than 10 digits
+    }
+  
+    setFormData({ ...formData, [name]: value });
   };
+  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Registration Successful!");
-    navigate("/");
+
+    const userData = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      phone: formData.phone,
+      role: formData.role,
+      user_login_status: formData.role === "Distributor" ? "Reject" : "Approve", // Default status
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Registration Successful!");
+        navigate("/"); // Redirect to login or homepage
+      } else {
+        alert(`Registration Failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("Registration failed. Please try again.");
+    }
   };
 
   const totalImages = 8;
@@ -80,8 +118,8 @@ const Register = () => {
           <form onSubmit={handleSubmit}>
             <input
               type="text"
-              name="username"
-              placeholder="Username"
+              name="name"
+              placeholder="Name"
               className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={handleChange}
               required
@@ -102,6 +140,17 @@ const Register = () => {
               onChange={handleChange}
               required
             />
+            <input
+  type="text"
+  name="phone"
+  placeholder="Phone Number"
+  className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+  onChange={handleChange}
+  required
+  pattern="\d{10}" // Enforces 10-digit number
+  maxLength="10"
+/>
+
             
             {/* Role Selection */}
             <select
@@ -109,9 +158,9 @@ const Register = () => {
               className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               onChange={handleChange}
             >
-              <option value="customer">Customer</option>
-              <option value="admin">Admin</option>
-              <option value="distributor">Distributor</option>
+              <option value="Customer">Customer</option>
+              <option value="Admin">Admin</option>
+              <option value="Distributor">Distributor</option>
             </select>
 
             <button type="submit" className="w-full bg-[#1e293b] hover:bg-[#1e293b] text-white py-2 rounded">

@@ -1,197 +1,328 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+
 
 const Apply = () => {
-  // Subcategories Data
-  const subcategories = {
-    "New Aadhar Card": "Apply for a new Aadhar card",
-    "Update Aadhar Details": "Update your existing Aadhar details",
-    "New PAN Card": "Apply for a fresh PAN card",
-    "PAN Correction": "Correct or update your PAN details",
-    "New Income Certificate": "Apply for a new income certificate",
-    "Renew Income Certificate": "Renew an existing income certificate",
-  };
+  const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState([]);
+  const [documentNames, setDocumentNames] = useState([]); // State for document names
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [message, setMessage] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // State Management
-  const [selectedSubcategory, setSelectedSubcategory] = useState("");
+  const token = localStorage.getItem("token");
+  let userData = { user_id: "", name: "", email: "", phone: "" };
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      userData = {
+        user_id: decoded.user_id,
+        name: decoded.name,
+        email: decoded.email,
+        phone: decoded.phone,
+      };
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
+  }
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    user_id: userData.user_id || "",
+    category_id: "",
+    subcategory_id: "",
+    name: userData.name || "",
+    email: userData.email || "",
+    phone: userData.phone || "",
     address: "",
-    documents: [],
+    files: [],
   });
 
-  // Handle Input Changes
+  // Fetch categories
+  useEffect(() => {
+    axios
+      .get("http://localhost:3000/categories")
+      .then((response) => setCategories(response.data))
+      .catch((error) => console.error("Error fetching categories:", error));
+  }, []);
+
+  // Fetch subcategories when category changes
+  useEffect(() => {
+    if (formData.category_id) {
+      axios.get("http://localhost:3000/subcategories")
+        .then((response) => {
+          const filteredSubcategories = response.data.filter(
+            (sub) => sub.category.category_id === parseInt(formData.category_id)
+          );
+          setSubcategories(filteredSubcategories);
+          if (filteredSubcategories.length > 0) {
+            setFormData((prev) => ({
+              ...prev,
+              subcategory_id: filteredSubcategories[0].subcategory_id // Auto-select first subcategory
+            }));
+          } else {
+            setFormData((prev) => ({
+              ...prev,
+              subcategory_id: "" // Reset if no subcategories
+            }));
+          }
+        })
+        .catch((error) => console.error("Error fetching subcategories:", error));
+    } else {
+      setSubcategories([]);
+      setFormData((prev) => ({ ...prev, subcategory_id: "" }));
+    }
+  }, [formData.category_id]);
+
+  // Fetch documents when category and subcategory change
+  useEffect(() => {
+    if (formData.category_id && formData.subcategory_id) {
+      axios.get(`http://localhost:3000/required-documents`, {
+        params: {
+          category_id: parseInt(formData.category_id, 10),
+          subcategory_id: parseInt(formData.subcategory_id, 10),
+        }
+      })
+        .then((response) => {
+          if (response.data.length > 0 && response.data[0].document_names) {
+            const documentsArray = response.data[0].document_names.split(",").map(doc => doc.trim());
+            setDocumentNames([...documentsArray]);
+          } else {
+            setDocumentNames([]);
+          }
+        })
+        .catch((error) => console.error("Error fetching documents:", error));
+    } else {
+      setDocumentNames([]);
+    }
+  }, [formData.category_id, formData.subcategory_id]);
+
+  // Handle file selection and validation
+  const handleFileUpload = (e) => {
+    const files = Array.from(e.target.files);
+    const validFiles = files.filter(file => file.size <= 200000); // 200 KB size limit
+    const invalidFiles = files.filter(file => file.size > 200000);
+
+    if (invalidFiles.length > 0) {
+      alert("Some files exceed 200 KB and were not added.");
+    }
+
+    setFormData((prev) => ({ ...prev, files: [...prev.files, ...validFiles] }));
+    setSelectedFiles([...selectedFiles, ...validFiles.map((file) => file.name)]);
+  };
+
+  // Handle form field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle Multiple File Uploads
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files); // Convert FileList to Array
-    setFormData((prev) => ({
-      ...prev,
-      documents: [...prev.documents, ...files],
-    }));
-  };
-
-  // Remove Selected File
-  const removeFile = (index) => {
-    setFormData((prev) => ({
-      ...prev,
-      documents: prev.documents.filter((_, i) => i !== index),
-    }));
-  };
-
-  // Handle Form Submission
-  const handleSubmit = (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Application Submitted for ${selectedSubcategory}`);
-    console.log("Uploaded Files:", formData.documents);
+    setMessage(""); // Clear previous messages
+
+    const formDataToSend = new FormData();
+
+    // Append form fields to formData
+    Object.keys(formData).forEach((key) => {
+      if (key !== "files") {
+        formDataToSend.append(key, formData[key]);
+      }
+    });
+
+    // Append selected category and subcategory names
+    const selectedCategory = categories.find(cat => cat.category_id === parseInt(formData.category_id));
+    const selectedSubcategory = subcategories.find(sub => sub.subcategory_id === parseInt(formData.subcategory_id));
+
+    formDataToSend.append("category_name", selectedCategory ? selectedCategory.category_name : "");
+    formDataToSend.append("subcategory_name", selectedSubcategory ? selectedSubcategory.subcategory_name : "");
+
+    // Append files to formData
+    formData.files.forEach((file) => {
+      formDataToSend.append("files", file);
+    });
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/documents/upload",
+        formDataToSend,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
+      setMessage("Your application has been submitted successfully! You will be contacted soon.");
+      setIsSubmitted(true); // Hide the form after submission
+      console.log("Success:", response.data);
+    } catch (error) {
+      setMessage("Failed to submit application. Please try again.");
+      console.error("Error:", error.response?.data || error.message);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-300 flex flex-col items-center py-12">
-      <h2 className="text-4xl font-extrabold text-[#1e293b] mb-6 animate-fade-in">
-        Apply for Government Documents
-      </h2>
 
-      {/* Apply Form */}
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white/90 p-8 rounded-2xl shadow-2xl backdrop-blur-lg w-full max-w-3xl transition-all duration-300 transform hover:scale-105"
-      >
-        {/* Subcategory Selection */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium text-lg">
-            Select Subcategory
-          </label>
-          <select
-            className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-400 transition-all duration-300 hover:shadow-lg"
-            value={selectedSubcategory}
-            onChange={(e) => setSelectedSubcategory(e.target.value)}
-          >
-            <option value="">-- Choose Subcategory --</option>
-            {Object.keys(subcategories).map((subcategory) => (
-              <option key={subcategory} value={subcategory}>
-                {subcategory}
-              </option>
-            ))}
-          </select>
-        </div>
 
-        {/* User Details - Two Fields Per Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-          <div>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center py-12">
+      {!isSubmitted ? (
+        <form
+          className="bg-white p-8 rounded-xl shadow-lg w-full max-w-3xl"
+          onSubmit={handleSubmit}  // Add this line here to bind handleSubmit function
+        >
+
+          {/* Category Selection */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium text-lg">
+              Category
+            </label>
+            <select
+              name="category_id"
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+              value={formData.category_id}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select a Category</option>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.category_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subcategory Selection */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium text-lg">
+              Subcategory
+            </label>
+            <select
+              name="subcategory_id"
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
+              value={formData.subcategory_id}
+              onChange={handleChange}
+              required
+              disabled={!formData.category_id}
+            >
+              <option value="">Select a Subcategory</option>
+              {subcategories.map((subcategory) => (
+                <option key={subcategory.subcategory_id} value={subcategory.subcategory_id}>
+                  {subcategory.subcategory_name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Full Name */}
+          <div className="mb-4">
             <label className="block text-gray-700 font-medium text-lg">
               Full Name
             </label>
             <input
               type="text"
               name="name"
-              placeholder="Enter your full name"
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-400 transition-all duration-300 hover:shadow-lg"
-              required
-              onChange={handleChange}
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
+              value={formData.name}
+              readOnly
             />
           </div>
 
-          <div>
+          {/* Email Address */}
+          <div className="mb-4">
             <label className="block text-gray-700 font-medium text-lg">
               Email Address
             </label>
             <input
               type="email"
               name="email"
-              placeholder="Enter your email"
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-400 transition-all duration-300 hover:shadow-lg"
-              required
-              onChange={handleChange}
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
+              value={formData.email}
+              readOnly
             />
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-          <div>
+          {/* Phone Number Field */}
+          <div className="mb-4">
             <label className="block text-gray-700 font-medium text-lg">
               Phone Number
             </label>
             <input
-              type="tel"
+              type="text"
               name="phone"
-              placeholder="Enter your phone number"
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-400 transition-all duration-300 hover:shadow-lg"
-              required
-              onChange={handleChange}
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
+              value={formData.phone}
+              readOnly
             />
           </div>
 
-          <div>
+          {/* Address Field */}
+          <div className="mb-4">
             <label className="block text-gray-700 font-medium text-lg">
               Address
             </label>
             <textarea
               name="address"
-              placeholder="Enter your address"
-              className="w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring focus:ring-blue-400 transition-all duration-300 hover:shadow-lg"
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
               required
               onChange={handleChange}
             ></textarea>
           </div>
-        </div>
 
-        {/* Multiple File Upload */}
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium text-lg">
-            Upload Required Documents
-          </label>
-          <div className="relative w-full flex items-center justify-center border-dashed border-2 border-gray-400 rounded-lg p-6 bg-gray-50 hover:bg-gray-100 transition-all duration-300 cursor-pointer">
+          {/* File Upload */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium text-lg">
+              Upload Files (Max 200 KB per file)
+            </label>
             <input
               type="file"
+              name="files"
               multiple
-              accept=".pdf,.jpg,.png"
-              className="absolute w-full h-full opacity-0 cursor-pointer"
-              required
               onChange={handleFileUpload}
+              className="w-full mt-2 p-3 border border-gray-300 rounded-lg"
             />
-            <p className="text-gray-500">Click or drag files here to upload</p>
+            {selectedFiles.length > 0 && (
+              <div className="mt-2">
+                <p className="font-medium">Selected Files:</p>
+                <ul className="list-disc ml-5">
+                  {selectedFiles.map((fileName, index) => (
+                    <li key={index}>{fileName}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
-          {/* Display Selected Files */}
-          {formData.documents.length > 0 && (
-            <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow">
-              <h3 className="text-gray-700 font-medium mb-2">Selected Files:</h3>
-              <ul className="space-y-2">
-                {formData.documents.map((file, index) => (
-                  <li
-                    key={index}
-                    className="flex justify-between items-center bg-white p-2 rounded-lg shadow-md"
-                  >
-                    <span className="text-gray-800">{file.name}</span>
-                    <button
-                      type="button"
-                      className="text-red-600 hover:text-red-800 font-bold"
-                      onClick={() => removeFile(index)}
-                    >
-                      ✕
-                    </button>
-                  </li>
+          {/* Required Documents */}
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium text-lg">
+              Required Documents
+            </label>
+            {documentNames.length > 0 ? (
+              <ul className="list-disc ml-5 mt-2">
+                {documentNames.map((doc, index) => (
+                  <li key={index} className="text-gray-800">{doc}</li>
                 ))}
               </ul>
-            </div>
-          )}
-        </div>
+            ) : (
+              <p className="text-gray-500 mt-2">No documents required.</p>
+            )}
+          </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full  bg-[#1e293b]  text-white py-3 rounded-lg font-semibold text-lg shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
-        >
-          Submit Application
-        </button>
-      </form>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="w-full bg-gray-800 text-white py-3 rounded-lg font-semibold text-lg shadow-lg"
+          >
+            Submit Application
+          </button>
+        </form>
+      ) : (
+        <div className="text-2xl font-semibold text-green-600">
+          {message}
+        </div>
+      )}
     </div>
   );
 };
 
 export default Apply;
+

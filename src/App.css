@@ -16,3 +16,7 @@
 .rotating-image {
   position: absolute;
 }
+/* html, body {
+  overflow: hidden;
+  height: 100%;
+} */
