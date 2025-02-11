@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
+import logo from "../assets/logo.png";
 
 const Sidebar = ({ onNavigate }) => {
   const [activePath, setActivePath] = useState("/");
@@ -26,12 +27,13 @@ const Sidebar = ({ onNavigate }) => {
   return (
     <div className="w-1/5 bg-[#00234E] text-white shadow-lg p-4 min-h-screen">
      <div className="flex flex-col items-center mb-6">
-  <img
-    src="logo.png"
-    alt="Logo"
-    className="h-20 w-20 mb-2 rounded-full"
-  />
-  <h1 className="text-xl font-bold">Vendor Management</h1>
+     <img
+  src={logo}
+  alt="Logo"
+  className="[h-10px] w-[200px] mb-2 "
+/>
+
+  {/* <h1 className="text-xl font-bold">Vendor Management</h1> */}
 </div>
 
       <nav className="mt-6">
@@ -41,6 +43,8 @@ const Sidebar = ({ onNavigate }) => {
           { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
             { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
             { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" },
+            { icon: <FaTasks />, label: "Required Documents", path: "/requireddocuments" },
+
             { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" },
             { icon: <FaFileAlt />, label: "Verify Documents", path: "/Verifydocuments" },
             { icon: <FaTasks />, label: "Distributor Assign", path: "/distributor-assign" },

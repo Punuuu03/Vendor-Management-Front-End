@@ -37,18 +37,42 @@ const Categories = () => {
   }, []);
 
   // Fetch Subcategories for a specific category
-  const fetchSubcategories = async (categoryId) => {
+  const fetchSubcategories = async (categoryId, categoryName) => {
+    console.log("Selected Category ID:", categoryId);
+    console.log("Selected Category Name:", categoryName);
+
     try {
-      const response = await axios.get(`${SUBCATEGORIES_API_URL}`);
-      // Filter subcategories for the selected category
+      const response = await axios.get(SUBCATEGORIES_API_URL);
       const filteredSubcategories = response.data.filter(
         (sub) => sub.category.category_id === categoryId
       );
       setSubcategories(filteredSubcategories);
-      setSelectedCategory(categoryId);
+      setSelectedCategory({ categoryId, categoryName });
     } catch (error) {
       console.error("Error fetching subcategories:", error);
     }
+  };
+
+  // Handle Subcategory Selection and Navigate to Apply Page
+  const handleSubcategorySelect = (
+    subcategoryId,
+    subcategoryName,
+    categoryId,
+    categoryName
+  ) => {
+    console.log("Selected Category ID:", categoryId);
+    console.log("Selected Category Name:", categoryName);
+    console.log("Selected Subcategory ID:", subcategoryId);
+    console.log("Selected Subcategory Name:", subcategoryName);
+
+    navigate("/Apply", {
+      state: {
+        categoryId,
+        categoryName,
+        subcategoryId,
+        subcategoryName,
+      },
+    });
   };
 
   return (
@@ -84,11 +108,17 @@ const Categories = () => {
             <div
               key={category.category_id}
               className="cursor-pointer bg-white text-gray-800 p-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
-              onClick={() => fetchSubcategories(category.category_id)}
+              onClick={() =>
+                fetchSubcategories(category.category_id, category.category_name)
+              }
             >
               {/* Icon Placeholder */}
-              <div className="text-6xl">{getCategoryIcon(category.category_name)}</div>
-              <h3 className="text-2xl font-semibold mt-4">{category.category_name}</h3>
+              <div className="text-6xl">
+                {getCategoryIcon(category.category_name)}
+              </div>
+              <h3 className="text-2xl font-semibold mt-4">
+                {category.category_name}
+              </h3>
               <p className="mt-2 text-gray-700">
                 Manage your {category.category_name} process.
               </p>
@@ -103,8 +133,18 @@ const Categories = () => {
               <div
                 key={sub.subcategory_id}
                 className="cursor-pointer bg-white text-gray-800 p-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
+                onClick={() =>
+                  handleSubcategorySelect(
+                    sub.subcategory_id,
+                    sub.subcategory_name,
+                    selectedCategory.categoryId,
+                    selectedCategory.categoryName
+                  )
+                }
               >
-                <h3 className="text-2xl font-semibold">{sub.subcategory_name}</h3>
+                <h3 className="text-2xl font-semibold">
+                  {sub.subcategory_name}
+                </h3>
               </div>
             ))
           ) : (
@@ -123,7 +163,7 @@ const getCategoryIcon = (categoryName) => {
     "PAN Card": <FaCreditCard />,
     "Income Certificate": <FaFileInvoiceDollar />,
     "Driving License": <FaCar />,
-    "Passport": <FaPassport />,
+    Passport: <FaPassport />,
     "Birth Certificate": <FaUserGraduate />,
     "Ration Card": <FaHome />,
     "Caste Certificate": <FaBookOpen />,
@@ -133,4 +173,4 @@ const getCategoryIcon = (categoryName) => {
   return icons[categoryName] || <FaFileInvoiceDollar />;
 };
 
-export default Categories;
+export default Categories;

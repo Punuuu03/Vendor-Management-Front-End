@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 const DistributorList = () => {
     const [distributors, setDistributors] = useState([]);
 
-    // Fetch data from the API
     useEffect(() => {
-        axios.get('http://localhost:3000/users/distributors')
+        axios.get("http://localhost:3000/users/distributors")
             .then(response => {
                 setDistributors(response.data);
             })
@@ -15,12 +15,10 @@ const DistributorList = () => {
             });
     }, []);
 
-    // Handle status update
     const updateStatus = (userId, status) => {
         axios.patch(`http://localhost:3000/users/status/${userId}`, { status })
             .then(response => {
                 if (response.data === "User status updated to " + status) {
-                    // Update the local state to reflect the status change
                     setDistributors(distributors.map(distributor => 
                         distributor.user_id === userId ? { ...distributor, user_login_status: status } : distributor
                     ));
@@ -32,56 +30,50 @@ const DistributorList = () => {
     };
 
     return (
-        <div className="container mx-auto p-6">
-            <h1 className="text-3xl font-semibold mb-6">Distributor List</h1>
-            <table className="min-w-full  bg-white border border-gray-300 rounded-lg shadow-md">
-                <thead className="bg-gray-800">
-                    <tr>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white border-r border-gray-300">User ID</th>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white border-r border-gray-300">Name</th>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white border-r border-gray-300">Email</th>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white border-r border-gray-300">Phone</th>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white border-r border-gray-300">Role</th>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white border-r border-gray-300">Status</th>
-                        <th className="px-4 py-4 text-left text-sm font-medium text-white">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {distributors.map((distributor, index) => (
-                        <tr 
-                            key={distributor.user_id} 
-                            className={`border-b ${index % 2 === 0 ? 'bg-gray-50' : 'bg-gray-100'}`}
-                        >
-                            <td className="px-4 py-2 text-sm text-gray-800 border-r border-gray-300">{distributor.user_id}</td>
-                            <td className="px-4 py-2 text-sm text-gray-800 border-r border-gray-300">{distributor.name}</td>
-                            <td className="px-4 py-2 text-sm text-gray-800 border-r border-gray-300">{distributor.email}</td>
-                            <td className="px-4 py-2 text-sm text-gray-800 border-r border-gray-300">{distributor.phone}</td>
-                            <td className="px-4 py-2 text-sm text-gray-800 border-r border-gray-300">{distributor.role}</td>
-                            <td className="px-4 py-2 text-sm text-gray-800 border-r border-gray-300">
-                                <span
-                                    className={`px-2 py-1 rounded-full text-white ${distributor.user_login_status === 'Approve' ? 'bg-green-500' : 'bg-red-500'}`}
-                                >
-                                    {distributor.user_login_status}
-                                </span>
-                            </td>
-                            <td className="px-4 py-2 text-sm">
-                                <button
-                                    onClick={() => updateStatus(distributor.user_id, 'Approve')}
-                                    className="bg-green-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-green-600"
-                                >
-                                    <i className="fas fa-check-circle mr-2"></i> Approve
-                                </button>
-                                <button
-                                    onClick={() => updateStatus(distributor.user_id, 'Reject')}
-                                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
-                                >
-                                    <i className="fas fa-times-circle mr-2"></i> Reject
-                                </button>
-                            </td>
+        <div className="container bg-white mx-auto p-6">
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">Distributor List</h1>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse border border-gray-300">
+                    <thead className="bg-gray-300 sticky top-0">
+                        <tr>
+                            <th className="border p-2">User ID</th>
+                            <th className="border p-2">Name</th>
+                            <th className="border p-2">Email</th>
+                            <th className="border p-2">Phone</th>
+                            <th className="border p-2">Role</th>
+                            <th className="border p-2">Status</th>
+                            <th className="border p-2">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {distributors.map((distributor, index) => (
+                            <tr key={distributor.user_id} className={index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"}>
+                                <td className="border p-2">{distributor.user_id}</td>
+                                <td className="border p-2">{distributor.name}</td>
+                                <td className="border p-2">{distributor.email}</td>
+                                <td className="border p-2">{distributor.phone}</td>
+                                <td className="border p-2">{distributor.role}</td>
+                                <td className="border p-2">
+                                    <span className={`px-2 py-1 rounded-full text-white ${distributor.user_login_status === 'Approve' ? 'bg-green-500' : 'bg-red-500'}`}> 
+                                        {distributor.user_login_status} 
+                                    </span>
+                                </td>
+                                <td className="border p-2 flex gap-2">
+                                    <button onClick={() => updateStatus(distributor.user_id, 'Approve')} className="bg-green-500 text-white px-3 py-1 rounded flex items-center gap-1 hover:bg-green-600">
+                                        <FaCheckCircle /> Approve
+                                    </button>
+                                    <button onClick={() => updateStatus(distributor.user_id, 'Reject')} className="bg-red-500 text-white px-3 py-1 rounded flex items-center gap-1 hover:bg-red-600">
+                                        <FaTimesCircle /> Reject
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

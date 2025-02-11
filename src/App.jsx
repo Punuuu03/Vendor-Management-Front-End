@@ -7,6 +7,7 @@ import Admindashboard from './Components/Admindashboard';
 import Adashinner from './Components/Adashinner';
 import Addcategory from './Components/Addcategory';
 import Addsubcategory from './Components/Addsubcategory';
+import RequiredDocuments from './Components/RequiredDocuments';
 
 import Customerdashboard from './Components/Customerdashboard';
 import Home from './Components/Home';
@@ -29,6 +30,7 @@ function App() {
            <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />
            <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
            <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
+           <Route path="/requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
 
            <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
            <Route path="/distributorlist" element={<Admindashboard><DistributorList/></Admindashboard>} />

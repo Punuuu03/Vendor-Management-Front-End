@@ -94,7 +94,7 @@ const AddCategory = () => {
   return (
     <div className="flex flex-col items-center min-h-screen p-10 bg-gray-100">
       {/* Add Category Section */}
-      <div className="w-full max-w-7xl bg-white p-6 rounded-lg shadow-lg">
+      <div className="w-full max-w-7xl bg-white p-6  shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Manage Categories</h2>
 
         <div className="flex items-center border-2 border-gray-300 rounded-lg shadow-md overflow-hidden">
@@ -108,7 +108,7 @@ const AddCategory = () => {
           />
           <button
             onClick={handleAddCategory}
-            className="bg-gradient-to-r from-purple-700 to-blue-600 text-white px-5 py-3 text-lg rounded-r-lg hover:opacity-90 transition duration-200 ml-4"
+            className="bg-[#00234E]  text-white px-5 py-3 text-lg rounded-r-lg hover:opacity-90 transition duration-200 ml-4"
           >
             Add Category
           </button>
@@ -116,13 +116,13 @@ const AddCategory = () => {
       </div>
 
       {/* Categories Table */}
-      <div className="w-full max-w-7xl mt-10 bg-white p-6 rounded-lg shadow-lg">
+      <div className="w-full  mt-10 bg-white p-6  shadow-lg">
         <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Category List</h2>
 
         {/* Scrollable Table Wrapper */}
-        <div className="overflow-y-auto max-h-60 border border-gray-300 rounded-lg">
+        <div className="overflow-y-auto max-h-60 border border-gray-300 ">
           <table className="w-full border-collapse">
-            <thead className="bg-gray-700 text-white sticky top-0">
+            <thead className="bg-gray-300 text-black sticky top-0">
               <tr>
                 <th className="p-3 text-left border-r border-gray-400">ID</th>
                 <th className="p-3 text-left border-r border-gray-400">Category Name</th>

@@ -105,7 +105,7 @@ const Subcategories = () => {
         <div className="flex justify-end -mt-10">
           <button
             onClick={() => setIsAdding(true)}
-            className="bg-gradient-to-r from-green-600 to-blue-500 text-white px-5 py-3  text-lg rounded-lg hover:opacity-90 transition duration-200 flex items-center"
+            className="bg-[#00234E] text-white px-5 py-3  text-lg rounded-lg hover:opacity-90 transition duration-200 flex items-center"
           >
             <FaPlus className="mr-2" /> Add Subcategory
           </button>
@@ -113,12 +113,12 @@ const Subcategories = () => {
       </div>
 
       {/* Table */}
-      <div className="w-full max-w-7xl -mt-2 bg-white p-6 rounded-lg shadow-lg">
+      <div className="w-full max-w-7xl -mt-2 bg-white p-6  shadow-lg">
         <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Subcategory List</h2>
 
-        <div className="overflow-y-auto max-h-60 border border-gray-300 rounded-lg">
+        <div className="overflow-y-auto max-h-60 border border-gray-300">
           <table className="w-full border-collapse">
-            <thead className="bg-gray-700 text-white sticky top-0">
+            <thead className="bg-gray-300 text-black sticky top-0">
               <tr>
                 <th className="p-3 text-left border-r border-gray-400">ID</th>
                 <th className="p-3 text-left border-r border-gray-400">Subcategory Name</th>
@@ -146,7 +146,7 @@ const Subcategories = () => {
                       {editingId === sub.subcategory_id ? (
                         <button
                           onClick={() => updateSubcategory(sub.subcategory_id)}
-                          className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
+                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
                         >
                           Save
                         </button>
