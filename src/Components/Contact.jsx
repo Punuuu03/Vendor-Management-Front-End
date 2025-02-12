@@ -42,7 +42,7 @@ const Contact = () => {
               placeholder="Your Message"
               className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#1e293b] outline-none transition"
             ></textarea>
-            <button className="w-full bg-[#1e293b] text-white py-3 rounded-md font-semibold hover:bg-[#324158] transition duration-300">
+            <button className="w-full bg-[#00234E] text-white py-3 rounded-md font-semibold hover:bg-[#324158] transition duration-300">
               Send Message
             </button>
           </form>
@@ -72,7 +72,7 @@ const Contact = () => {
       </section> */}
 
       {/* Footer */}
-      <footer className="bg-[#1e293b] text-white text-center py-6 shadow-md">
+      <footer className="bg-[#00234E] text-white text-center py-6 shadow-md">
         <p>© 2025 Vendor Management System | All Rights Reserved</p>
       </footer>
     </div>

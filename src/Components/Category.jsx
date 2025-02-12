@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  FaIdCard,
-  FaCreditCard,
-  FaFileInvoiceDollar,
-  FaCar,
-  FaPassport,
-  FaUserGraduate,
-  FaHome,
-  FaBookOpen,
-  FaBriefcase,
-  FaShoppingCart,
-} from "react-icons/fa";
+
+// Importing images
+import AadharCardImg from "../assets/adhar.png";
+import PANCardImg from "../assets/adhar.png";
+import IncomeCertificateImg from "../assets/adhar.png";
+import DrivingLicenseImg from "../assets/adhar.png";
+import PassportImg from "../assets/adhar.png";
+import BirthCertificateImg from "../assets/adhar.png";
+import RationCardImg from "../assets/adhar.png";
+import CasteCertificateImg from "../assets/adhar.png";
+import EmploymentCardImg from "../assets/adhar.png";
+import ShopLicenseImg from "../assets/adhar.png";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -23,7 +23,6 @@ const Categories = () => {
   const API_BASE_URL = "http://localhost:3000/categories";
   const SUBCATEGORIES_API_URL = "http://localhost:3000/subcategories";
 
-  // Fetch Categories from API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -36,11 +35,7 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  // Fetch Subcategories for a specific category
   const fetchSubcategories = async (categoryId, categoryName) => {
-    console.log("Selected Category ID:", categoryId);
-    console.log("Selected Category Name:", categoryName);
-
     try {
       const response = await axios.get(SUBCATEGORIES_API_URL);
       const filteredSubcategories = response.data.filter(
@@ -53,124 +48,92 @@ const Categories = () => {
     }
   };
 
-  // Handle Subcategory Selection and Navigate to Apply Page
-  const handleSubcategorySelect = (
-    subcategoryId,
-    subcategoryName,
-    categoryId,
-    categoryName
-  ) => {
-    console.log("Selected Category ID:", categoryId);
-    console.log("Selected Category Name:", categoryName);
-    console.log("Selected Subcategory ID:", subcategoryId);
-    console.log("Selected Subcategory Name:", subcategoryName);
-
+  const handleSubcategorySelect = (subcategoryId, subcategoryName, categoryId, categoryName) => {
     navigate("/Apply", {
-      state: {
-        categoryId,
-        categoryName,
-        subcategoryId,
-        subcategoryName,
-      },
+      state: { categoryId, categoryName, subcategoryId, subcategoryName },
     });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12">
-      {/* Header */}
-      <div className="text-center max-w-3xl px-4">
-        <h1 className="text-4xl font-bold text-[#1e293b] mb-4">
-          Government Document Services
-        </h1>
-        <p className="text-lg text-gray-600">
-          Apply for various government documents quickly and hassle-free. Select
-          a category below to proceed with your application.
-        </p>
+    <div className="bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn">
+      <section className="relative bg-[#1e293b] text-white py-16 px-6 text-center shadow-md">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4">Government Document Services</h1>
+          <p className="text-lg text-gray-300">
+            Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
+          </p>
+        </div>
+      </section>
+
+      <div className="flex justify-center  mt-6">
+        {selectedCategory ? (
+          <button
+            onClick={() => {
+              setSelectedCategory(null);
+              setSubcategories([]);
+            }}
+            className="px-6 py-2  bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-800 transition"
+          >
+            ← Back to Categories
+          </button>
+        ) : (
+          <button
+            className="px-6 py-2 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-700 transition"
+          >
+            Categories →
+          </button>
+        )}
       </div>
 
-      {/* Back Button (Visible only when showing subcategories) */}
-      {selectedCategory && (
-        <button
-          onClick={() => {
-            setSelectedCategory(null);
-            setSubcategories([]);
-          }}
-          className="mt-6 px-6 py-2 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-800 transition"
-        >
-          ← Back to Categories
-        </button>
-      )}
-
-      {/* Category Grid */}
-      {!selectedCategory ? (
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl mx-auto px-6 mt-10">
-          {categories.map((category) => (
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-7xl mx-auto px-6 mt-10">
+        {!selectedCategory ? (
+          categories.map((category, index) => (
             <div
               key={category.category_id}
-              className="cursor-pointer bg-white text-gray-800 p-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
-              onClick={() =>
-                fetchSubcategories(category.category_id, category.category_name)
-              }
+              className="cursor-pointer bg-white text-gray-800 p-6 w-full rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
+              onClick={() => fetchSubcategories(category.category_id, category.category_name)}
             >
-              {/* Icon Placeholder */}
-              <div className="text-6xl">
-                {getCategoryIcon(category.category_name)}
-              </div>
-              <h3 className="text-2xl font-semibold mt-4">
-                {category.category_name}
-              </h3>
-              <p className="mt-2 text-gray-700">
-                Manage your {category.category_name} process.
-              </p>
+              <img src={getCategoryImage(index)} alt={category.category_name} className="w-[120px] h-[120px] mb-4" />
+              <h3 className="text-lg font-semibold text-center break-words w-full">{category.category_name}</h3>
+              <p className="mt-2 text-gray-700 text-center text-sm break-words w-full">Manage your {category.category_name} process.</p>
             </div>
-          ))}
-        </div>
-      ) : (
-        // Subcategories View
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl mx-auto px-6 mt-10">
-          {subcategories.length > 0 ? (
+          ))
+        ) : (
+          subcategories.length > 0 ? (
             subcategories.map((sub) => (
               <div
                 key={sub.subcategory_id}
-                className="cursor-pointer bg-white text-gray-800 p-6 rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
-                onClick={() =>
-                  handleSubcategorySelect(
-                    sub.subcategory_id,
-                    sub.subcategory_name,
-                    selectedCategory.categoryId,
-                    selectedCategory.categoryName
-                  )
-                }
+                className="cursor-pointer bg-white text-gray-800 p-6 w-full rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
+                onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
               >
-                <h3 className="text-2xl font-semibold">
-                  {sub.subcategory_name}
-                </h3>
+                <img src={getCategoryImage(categories.findIndex(cat => cat.category_id === selectedCategory.categoryId))} alt={sub.subcategory_name} className="w-[120px] h-[120px] mb-4" />
+                <h3 className="text-lg font-semibold text-center break-words w-full">{sub.subcategory_name}</h3>
               </div>
             ))
           ) : (
-            <p className="text-lg text-gray-600">No subcategories found.</p>
-          )}
-        </div>
-      )}
+            <p className="text-lg text-gray-600 text-center w-full">No subcategories found.</p>
+          )
+        )}
+      </div>
     </div>
   );
 };
 
-// Function to get category icons dynamically
-const getCategoryIcon = (categoryName) => {
-  const icons = {
-    "Aadhar Card": <FaIdCard />,
-    "PAN Card": <FaCreditCard />,
-    "Income Certificate": <FaFileInvoiceDollar />,
-    "Driving License": <FaCar />,
-    Passport: <FaPassport />,
-    "Birth Certificate": <FaUserGraduate />,
-    "Ration Card": <FaHome />,
-    "Caste Certificate": <FaBookOpen />,
-    "Employment Card": <FaBriefcase />,
-    "Shop License": <FaShoppingCart />,
-  };
-  return icons[categoryName] || <FaFileInvoiceDollar />;
+const categoryImages = [
+  AadharCardImg,
+  PANCardImg,
+  IncomeCertificateImg,
+  DrivingLicenseImg,
+  PassportImg,
+  BirthCertificateImg,
+  RationCardImg,
+  CasteCertificateImg,
+  EmploymentCardImg,
+  ShopLicenseImg,
+];
+
+const getCategoryImage = (index) => {
+  return categoryImages[index % categoryImages.length];
 };
 
-export default Categories;
+export default Categories;

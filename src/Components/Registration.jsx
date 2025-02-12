@@ -164,7 +164,7 @@ const Register = () => {
               <option value="Distributor">Distributor</option>
             </select>
 
-            <button type="submit" className="w-full bg-[#1e293b] hover:bg-[#1e293b] text-white py-2 rounded">
+            <button type="submit" className="w-full bg-[#00234E] hover:bg-[#1e293b] text-white py-2 rounded">
               Register
             </button>
           </form>

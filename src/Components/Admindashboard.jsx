@@ -47,7 +47,7 @@ const Sidebar = ({ onNavigate }) => {
 
             { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" },
             { icon: <FaFileAlt />, label: "Verify Documents", path: "/Verifydocuments" },
-            { icon: <FaTasks />, label: "Distributor Assign", path: "/distributor-assign" },
+            // { icon: <FaTasks />, label: "Distributor Assign", path: "/distributor-assign" },
           ].map((item, index) => (
             <li
               key={index}

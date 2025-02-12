@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+import logo from "../assets/logo.png"; // Import the logo
+// eslint-disable-next-line react/prop-types
 const Navbar = ({ children }) => {
   const [userEmail] = useState("customer@example.com"); // Replace with actual user email
   const [isOpen, setIsOpen] = useState(false);
@@ -14,19 +15,18 @@ const Navbar = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="bg-[#1e293b] text-white py-4 px-6 flex justify-between items-center shadow-md">
+      <nav className="bg-white text-[#1e293b] py-4 px-6 flex justify-between items-center shadow-md">
         {/* Left: Logo with Image */}
         <div className="flex items-center space-x-3">
-          <img
-            src="https://content.jdmagicbox.com/v2/comp/kolkata/b1/033pxx33.xx33.231201170458.u4b1/catalogue/bharatmala-seva-bharati-kolkata-81j6t16kev.jpg"
-            alt="Logo"
-            className="w-10 h-10 rounded-full"
-          />
-          <h1 className="text-2xl font-bold">Vendor Management</h1>
+        <div className="w-full flex justify-center -mb-4">
+        <img src={logo} alt="Logo" className="w-48 h-20 rounded-full" />
+      </div>
+
+          {/* <h1 className="text-2xl font-bold">Vendor Management</h1> */}
         </div>
 
         {/* Right: Navigation Links & Profile Dropdown */}
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center text-extrabold space-x-6">
           <ul className="flex space-x-6">
             <li><Link to="/Home" className="hover:underline">Home</Link></li>
             <li><Link to="/About" className="hover:underline">About</Link></li>
@@ -67,4 +67,4 @@ const Navbar = ({ children }) => {
   );
 };
 
-export default Navbar;
+export default Navbar;

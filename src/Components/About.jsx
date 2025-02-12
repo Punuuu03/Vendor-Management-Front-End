@@ -56,7 +56,7 @@ const About = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1e293b] text-white text-center py-6 shadow-md">
+      <footer className="bg-[#00234E] text-white text-center py-6 shadow-md">
         <p>© 2025 Vendor Management System | All Rights Reserved</p>
       </footer>
     </div>

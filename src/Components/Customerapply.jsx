@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaFileAlt } from "react-icons/fa"; // Import document icon
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -60,54 +61,61 @@ const VerifyDocuments = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">Verify Documents</h1>
+    <div className="w-full bg-gray-100 p-6">
+      <div className="w-full bg-white p-6">
+      <div className="flex justify-center items-center mb-4">
+  <h1 className="text-2xl font-bold">Applications</h1>
+</div>
+
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-white shadow-md rounded-lg border">
-          <thead>
-            <tr className="bg-gray-200 text-gray-700">
-              <th className="p-3 text-left">User ID</th>
-              <th className="p-3 text-left">Document ID</th>
-              <th className="p-3 text-left">Category</th>
-              <th className="p-3 text-left">Subcategory</th>
-              <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Phone</th>
-              <th className="p-3 text-left">Address</th>
-              <th className="p-3 text-left">Documents</th>
-              <th className="p-3 text-left">Verification</th>
-              <th className="p-3 text-left">Certificate</th>
+        <table className="w-full border-collapse border border-gray-300">
+          <thead className="bg-gray-300 sticky top-0">
+            <tr>
+              <th className="border p-3">S.No</th>
+              <th className="border p-3">User ID</th>
+              <th className="border p-3">Document ID</th>
+              <th className="border p-3">Category</th>
+              <th className="border p-3">Subcategory</th>
+              <th className="border p-3">Name</th>
+              <th className="border p-3">Email</th>
+              <th className="border p-3">Phone</th>
+              <th className="border p-3">Address</th>
+              <th className="border p-3">Documents</th>
+              <th className="border p-3">Verification</th>
+              <th className="border p-3">Certificate</th>
             </tr>
           </thead>
           <tbody>
-            {filteredDocuments.map((doc) => (
-              <tr key={doc.document_id} className="border-b">
-                <td className="p-3">{doc.user_id}</td>
-                <td className="p-3">{doc.document_id}</td>
-                <td className="p-3">{doc.category_name}</td>
-                <td className="p-3">{doc.subcategory_name}</td>
-                <td className="p-3">{doc.name}</td>
-                <td className="p-3">{doc.email}</td>
-                <td className="p-3">{doc.phone}</td>
-                <td className="p-3">{doc.address}</td>
-                <td className="p-3">
-                  {doc.documents &&
-                    doc.documents.map((file, index) => (
-                      <div key={index}>
+            {filteredDocuments.map((doc, index) => (
+              <tr key={doc.document_id} className="border-t hover:bg-gray-100">
+                <td className="border p-2 text-center">{index + 1}</td>
+                <td className="border p-2 text-center">{doc.user_id}</td>
+                <td className="border p-2 text-center">{doc.document_id}</td>
+                <td className="border p-2">{doc.category_name}</td>
+                <td className="border p-2">{doc.subcategory_name}</td>
+                <td className="border p-2">{doc.name}</td>
+                <td className="border p-2">{doc.email}</td>
+                <td className="border p-2">{doc.phone}</td>
+                <td className="border p-2">{doc.address}</td>
+                <td className="border p-2">
+                  <div className="flex justify-center">
+                    {doc.documents &&
+                      doc.documents.map((file, index) => (
                         <a
+                          key={index}
                           href={file.file_path}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline"
                         >
-                          View Document
+                          <FaFileAlt className="text-blue-500 text-xl" />
                         </a>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
                 </td>
-                <td className="p-3">
+                <td className="border p-2 ">
                   <span
-                    className={`px-3 py-1 text-white rounded-full ${
+                    className={`px-3 py-1 rounded-full text-white text-sm flex justify-center ${
                       doc.status === "Approved"
                         ? "bg-green-500"
                         : doc.status === "Rejected"
@@ -120,7 +128,7 @@ const VerifyDocuments = () => {
                     {doc.status}
                   </span>
                 </td>
-                <td className="p-3">
+                <td className="p-3 flex justify-center">
                   {doc.status === "Completed" && getCertificateByDocumentId(doc.document_id) ? (
                     <button
                       onClick={() => handleViewCertificate(doc.document_id)}
@@ -129,13 +137,14 @@ const VerifyDocuments = () => {
                       View
                     </button>
                   ) : (
-                    <span className="text-gray-500">Not Available</span>
+                    <span className="text-gray-500 text-center">Not Available</span>
                   )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
       </div>
     </div>
   );
