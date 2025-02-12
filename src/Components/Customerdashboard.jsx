@@ -32,6 +32,7 @@ const Navbar = ({ children }) => {
             <li><Link to="/About" className="hover:underline">About</Link></li>
             <li><Link to="/contact" className="hover:underline">Contact</Link></li>
             <li><Link to="/Category" className="hover:underline">Category</Link></li>
+            <li><Link to="/Customerapply" className="hover:underline">Applications</Link></li>
           </ul>
 
           {/* Profile Dropdown */}

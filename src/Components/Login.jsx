@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../index.css"; // Ensure Tailwind & CSS are imported
@@ -41,7 +42,7 @@ const Login = () => {
       const { role } = formData;
       if (role === "admin") navigate("/Adashinner");
       else if (role === "customer") navigate("/Home");
-      else if (role === "distributor") navigate("/Distributordashboard");
+      else if (role === "distributor") navigate("/Ddashinner");
       else alert("Please select a valid role");
     } catch (error) {
       setError(error.message);
