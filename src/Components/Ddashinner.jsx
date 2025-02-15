@@ -1,148 +1,113 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import React from "react";
-import { Line, Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-// import AdminDashboard from "./AdminDashboard"; // Importing AdminDashboard
+import "./Dashboardlanding.css"; // Custom CSS for animations
 
-import usersIcon from "../assets/Login.png";
-import revenueIcon from "../assets/Login.png";
-import subscriptionsIcon from "../assets/Login.png";
+// Importing Icons/Images
+import firstIcon from "../assets/cus.jpeg";
+import secondIcon from "../assets/appform.png";
+import thirdIcon from "../assets/cvimg.png";
+import fourthIcon from "../assets/a.png";
+import customerFormIcon from "../assets/lists.jpg";
+import applicationFormIcon from "../assets/a.png";
+import customersListIcon from "../assets/lists.jpg";
+import applicationsListIcon from "../assets/app-list.jpg";
 
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
-
-const Adashinner = () => {
-  // Line chart data
-  const userActivityData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Active Users",
-        data: [120, 200, 150, 300, 250, 400],
-        borderColor: "blue",
-        fill: false,
-      },
-    ],
-  };
-
-  // Bar chart data
-  const salesData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Requests",
-        data: [100, 150, 200, 250, 300, 350],
-        backgroundColor: "rgb(187, 247, 208)",
-      },
-    ],
+const DashboardLanding = () => {
+  // Static Data
+  const data = {
+    totalCustomer: 1500,
+    totalApplication: 2,
+    OnlineFormSubmitted: 1,
+    PendingApplication: 8,
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar & Dashboard */}
-      {/* <AdminDashboard /> */}
-
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Total Vendors Card */}
-          <div className="bg-green-200 p-4 rounded shadow flex items-center">
-            <img src={revenueIcon} alt="Revenue" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Vendors</h2>
-              <p className="text-xl">₹2058</p>
-            </div>
-          </div>
-
-          {/* Total Transactions Card */}
-          <div className="bg-yellow-200 p-4 rounded shadow flex items-center">
-            <img src={subscriptionsIcon} alt="Transactions" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Transactions</h2>
-              <p className="text-xl">398</p>
-            </div>
-          </div>
-
-          {/* Total Categories Card */}
-          <div className="bg-blue-200 p-4 rounded shadow flex items-center">
-            <img src={usersIcon} alt="Categories" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Categories</h2>
-              <p className="text-xl">5032</p>
-            </div>
-          </div>
-
-          {/* Total Subcategories Card */}
-          <div className="bg-green-200 p-4 rounded shadow flex items-center">
-            <img src={revenueIcon} alt="Subcategories" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Subcategories</h2>
-              <p className="text-xl">₹2058</p>
-            </div>
-          </div>
-
-          {/* Total Users Card */}
-          <div className="bg-blue-200 p-4 rounded shadow flex items-center">
-            <img src={usersIcon} alt="Users" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Users</h2>
-              <p className="text-xl">5032</p>
-            </div>
-          </div>
+    <div className="p-6 ml-0"> {/* Adjust margin for sidebar */}
+      {/* Marquee Section */}
+      <div className="overflow-hidden whitespace-nowrap bg-gray-100 py-2">
+        <div className="marquee">
+          <span>Welcome to the Vendor Management</span>
+          <span>Welcome to the Vendor Management</span>
+          <span>Welcome to the Vendor Management</span>
         </div>
+      </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold">User Activity</h2>
-            <Line data={userActivityData} />
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold">Vendor Data</h2>
-            <Bar data={salesData} />
-          </div>
+      {/* Overview Section */}
+      <div className="mt-5">
+        <h2 className="text-2xl font-bold">Overview</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          {/* Overview Cards */}
+          {[{
+            title: "Total Customers",
+            count: data.totalCustomer,
+            bgColor: "bg-red-200",
+            iconBg: "bg-red-300",
+            icon: firstIcon
+          }, {
+            title: "Today's Applications",
+            count: data.totalApplication,
+            bgColor: "bg-blue-200",
+            iconBg: "bg-blue-300",
+            icon: secondIcon
+          }, {
+            title: "Completed Applications",
+            count: data.OnlineFormSubmitted,
+            bgColor: "bg-green-200",
+            iconBg: "bg-green-300",
+            icon: thirdIcon
+          }, {
+            title: "Pending Applications",
+            count: data.PendingApplication,
+            bgColor: "bg-purple-200",
+            iconBg: "bg-purple-300",
+            icon: fourthIcon
+          }].map((item, index) => (
+            <div key={index} className={`${item.bgColor} p-3 rounded-lg shadow-md w-60`}> {/* Reduced width */}
+              <div className="flex justify-between items-center">
+                <div>
+                  <h5 className="text-md font-semibold">{item.title}</h5>
+                  <h3 className="text-xl font-bold">{item.count}</h3>
+                </div>
+                <div className={`${item.iconBg} rounded-full w-12 h-12 flex items-center justify-center`}>
+                  {item.icon ? <img src={item.icon} alt={item.title} className="w-8 h-8" /> : <i className={`${item.iconClass} text-white text-2xl`}></i>}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
 
-        {/* Customer Summary Table */}
-        <div className="bg-white p-4 rounded shadow mt-6">
-          <h2 className="text-xl font-semibold">Customer Summary</h2>
-          <table className="min-w-full mt-4">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2">Name</th>
-                <th className="p-2">Email</th>
-                <th className="p-2">Phone</th>
-                <th className="p-2">Subscription</th>
-              </tr>
-            </thead>
-            <tbody>
-              {["John Doe", "Jane Smith", "Michael Johnson"].map((name, index) => (
-                <tr key={index} className="border-t">
-                  <td className="p-2">{name}</td>
-                  <td className="p-2">{`${name.toLowerCase().replace(" ", "")}@example.com`}</td>
-                  <td className="p-2">123-456-7890</td>
-                  <td className="p-2">{index % 2 === 0 ? "Basic" : "Premium"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Quick Links Section */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold">Quick Links</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+          {[{
+            title: "Customer Form",
+            link: "/customers/create",
+            icon: customerFormIcon
+          }, {
+            title: "Application Form",
+            link: "/applications/create",
+            icon: applicationFormIcon
+          }, {
+            title: "Customers List",
+            link: "/customers",
+            icon: customersListIcon
+          }, {
+            title: "Application List",
+            link: "/applications",
+            icon: applicationsListIcon
+          }].map((item, index) => (
+            <div key={index} className="text-center">
+              <a href={item.link}>
+                <img src={item.icon} alt={item.title} className="mx-auto w-36 h-36 object-cover rounded-md shadow-md" /> {/* Reduced image size */}
+              </a>
+              <p className="mt-2 text-sm font-semibold">{item.title}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 };
 
-export default Adashinner;
+export default DashboardLanding;

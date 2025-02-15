@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-// Importing images
-import AadharCardImg from "../assets/adhar.png";
-import PANCardImg from "../assets/adhar.png";
-import IncomeCertificateImg from "../assets/adhar.png";
-import DrivingLicenseImg from "../assets/adhar.png";
-import PassportImg from "../assets/adhar.png";
-import BirthCertificateImg from "../assets/adhar.png";
-import RationCardImg from "../assets/adhar.png";
-import CasteCertificateImg from "../assets/adhar.png";
-import EmploymentCardImg from "../assets/adhar.png";
-import ShopLicenseImg from "../assets/adhar.png";
+import { FaFileAlt } from "react-icons/fa";
 
 const Categories = () => {
   const navigate = useNavigate();
@@ -55,47 +44,37 @@ const Categories = () => {
   };
 
   return (
-    <div className="bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn">
-      <section className="relative bg-[#1e293b] text-white py-16 px-6 text-center shadow-md">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">Government Document Services</h1>
-          <p className="text-lg text-gray-300">
+    <div className="bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6">
+      <section className="relative bg-orange-300 text-black py-16 px-6 text-center shadow-md">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold -mt-9 mb-1">Government Document Services</h1>
+          <p className="text-lg -mb-10 text-gray-900">
             Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
           </p>
         </div>
       </section>
 
-      <div className="flex justify-center  mt-6">
-        {selectedCategory ? (
-          <button
-            onClick={() => {
-              setSelectedCategory(null);
-              setSubcategories([]);
-            }}
-            className="px-6 py-2  bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-800 transition"
-          >
-            ← Back to Categories
-          </button>
+      {/* Title or Back Button */}
+      <div className="max-w-7xl mx-auto mt-6 flex items-center">
+        {!selectedCategory ? (
+          <h2 className="text-2xl font-bold text-left mb-5 text-gray-900">Select Categories</h2>
         ) : (
-          <button
-            className="px-6 py-2 bg-gray-700 text-white rounded-lg shadow-md hover:bg-gray-700 transition"
-          >
-            Categories →
-          </button>
+          <h2 className="text-2xl font-bold text-left mb-5 text-gray-900">Select SubCategories</h2>
+
         )}
       </div>
 
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-7xl mx-auto px-6 mt-10">
+      {/* Categories & Subcategories Grid */}
+      <div className="grid grid-cols-3 gap-4 w-full max-w-7xl mx-auto mt-4">
         {!selectedCategory ? (
-          categories.map((category, index) => (
+          categories.map((category) => (
             <div
               key={category.category_id}
-              className="cursor-pointer bg-white text-gray-800 p-6 w-full rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
+              className="flex items-center w-full p-4 rounded-lg shadow-md cursor-pointer transition-all duration-300 bg-gray-100 hover:bg-orange-200"
               onClick={() => fetchSubcategories(category.category_id, category.category_name)}
             >
-              <img src={getCategoryImage(index)} alt={category.category_name} className="w-[120px] h-[120px] mb-4" />
-              <h3 className="text-lg font-semibold text-center break-words w-full">{category.category_name}</h3>
-              <p className="mt-2 text-gray-700 text-center text-sm break-words w-full">Manage your {category.category_name} process.</p>
+              <FaFileAlt className="text-2xl text-orange-500" />
+              <span className="ml-4 text-lg font-medium">{category.category_name}</span>
             </div>
           ))
         ) : (
@@ -103,11 +82,11 @@ const Categories = () => {
             subcategories.map((sub) => (
               <div
                 key={sub.subcategory_id}
-                className="cursor-pointer bg-white text-gray-800 p-6 w-full rounded-xl shadow-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center text-center border border-gray-300"
+                className="flex items-center w-full p-4 rounded-lg shadow-md cursor-pointer transition-all duration-300 bg-gray-100 hover:bg-orange-200"
                 onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
               >
-                <img src={getCategoryImage(categories.findIndex(cat => cat.category_id === selectedCategory.categoryId))} alt={sub.subcategory_name} className="w-[120px] h-[120px] mb-4" />
-                <h3 className="text-lg font-semibold text-center break-words w-full">{sub.subcategory_name}</h3>
+                <FaFileAlt className="text-2xl text-orange-500" />
+                <span className="ml-4 text-lg font-medium">{sub.subcategory_name}</span>
               </div>
             ))
           ) : (
@@ -117,23 +96,6 @@ const Categories = () => {
       </div>
     </div>
   );
-};
-
-const categoryImages = [
-  AadharCardImg,
-  PANCardImg,
-  IncomeCertificateImg,
-  DrivingLicenseImg,
-  PassportImg,
-  BirthCertificateImg,
-  RationCardImg,
-  CasteCertificateImg,
-  EmploymentCardImg,
-  ShopLicenseImg,
-];
-
-const getCategoryImage = (index) => {
-  return categoryImages[index % categoryImages.length];
 };
 
 export default Categories;

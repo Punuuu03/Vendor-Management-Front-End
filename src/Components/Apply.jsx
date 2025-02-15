@@ -5,6 +5,7 @@ import { useLocation } from "react-router-dom";
 
 const Apply = () => {
   const [documentNames, setDocumentNames] = useState([]);
+  const [fieldNames, setFieldNames] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState({});
   const location = useLocation();
   const { categoryId, categoryName, subcategoryId, subcategoryName } =
@@ -38,18 +39,14 @@ const Apply = () => {
     phone: userData.phone || "",
     address: "",
     files: {},
+    fields: {},
   });
 
   // Fetch required documents when category and subcategory change
   useEffect(() => {
     if (formData.category_id && formData.subcategory_id) {
       axios
-        .get(`http://localhost:3000/required-documents`, {
-          params: {
-            category_id: parseInt(formData.category_id, 10),
-            subcategory_id: parseInt(formData.subcategory_id, 10),
-          },
-        })
+        .get(`http://localhost:3000/required-documents/${formData.category_id}/${formData.subcategory_id}`)
         .then((response) => {
           if (response.data.length > 0 && response.data[0].document_names) {
             const documentsArray = response.data[0].document_names
@@ -69,6 +66,37 @@ const Apply = () => {
     }
   }, [formData.category_id, formData.subcategory_id]);
 
+  // Fetch field names dynamically
+  useEffect(() => {
+    if (formData.category_id && formData.subcategory_id) {
+      axios
+        .get(`http://localhost:3000/field-names/${formData.category_id}/${formData.subcategory_id}`)
+        .then((response) => {
+          if (response.data.length > 0 && response.data[0].document_fields) {
+            const fieldsArray = response.data[0].document_fields
+              .split(",")
+              .map((field) => field.trim());
+            setFieldNames(fieldsArray);
+            setFormData((prev) => ({
+              ...prev,
+              document_fields: fieldsArray.reduce((acc, field) => ({ ...acc, [field]: "" }), {}),
+            }));
+          } else {
+            setFieldNames([]);
+          }
+        })
+        .catch((error) => console.error("Error fetching field names:", error));
+    } else {
+      setFieldNames([]);
+    }
+  }, [formData.category_id, formData.subcategory_id]);
+
+  const handleFieldChange = (e, fieldName) => {
+    setFormData((prev) => ({
+      ...prev,
+      document_fields: { ...prev.document_fields, [fieldName]: e.target.value },
+    }));
+  };
   // Handle file upload
   const handleFileUpload = (e, docName) => {
     const file = e.target.files[0];
@@ -79,29 +107,36 @@ const Apply = () => {
     }));
   };
 
-  // Handle form field changes
+  // Handle input field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form..."); // Debugging log
+    console.log("Submitting form...");
 
     const formDataToSend = new FormData();
 
     // Append all non-file fields
     Object.keys(formData).forEach((key) => {
-      if (key !== "files") {
+      if (key !== "files" && key !== "fields") {
         formDataToSend.append(key, formData[key]);
       }
+    });
+
+    // Append dynamically generated field inputs
+    Object.keys(formData.fields).forEach((field) => {
+      formDataToSend.append(field, formData.fields[field]);
     });
 
     // Append files with "files" as the key
     Object.keys(formData.files).forEach((docName) => {
       if (formData.files[docName]) {
-        formDataToSend.append("files", formData.files[docName]); // Using "files" key for backend compatibility
+        formDataToSend.append("files", formData.files[docName]);
       }
     });
 
@@ -113,12 +148,10 @@ const Apply = () => {
       );
 
       alert("Your application has been submitted successfully!");
-
-     } catch (error) {
+    } catch (error) {
       console.error("Submission Error:", error.response);
-      alert(`Failed to submit application:${error.response?.data?.message || error.message}`);
-   }
-   
+      alert(`Failed to submit application: ${error.response?.data?.message || error.message}`);
+    }
   };
 
   return (
@@ -137,7 +170,7 @@ const Apply = () => {
             name="category_name"
             className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
             value={formData.category_name}
-            readOnly
+          
           />
         </div>
 
@@ -151,7 +184,7 @@ const Apply = () => {
             name="subcategory_name"
             className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
             value={formData.subcategory_name}
-            readOnly
+          
           />
         </div>
 
@@ -164,8 +197,8 @@ const Apply = () => {
             type="text"
             name="name"
             className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
-            value={formData.name}
-            readOnly
+            onChange={handleChange}
+      
           />
         </div>
 
@@ -178,8 +211,8 @@ const Apply = () => {
             type="email"
             name="email"
             className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
-            value={formData.email}
-            readOnly
+            onChange={handleChange}
+        
           />
         </div>
 
@@ -192,8 +225,8 @@ const Apply = () => {
             type="text"
             name="phone"
             className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100"
-            value={formData.phone}
-            readOnly
+            onChange={handleChange}
+      
           />
         </div>
 
@@ -208,6 +241,31 @@ const Apply = () => {
           ></textarea>
         </div>
 
+
+
+        <div className="mb-4">
+      <label className="block text-gray-700 font-medium text-lg">Additional Fields</label>
+      {fieldNames.length > 0 ? (
+        fieldNames.map((field, index) => (
+          <div key={index} className="mt-2">
+            <label className="block text-gray-800 font-medium">{field}</label>
+            <input
+              type="text"
+              name={field}
+              value={formData.document_fields[field] || ""}
+              onChange={(e) => handleFieldChange(e, field)}
+              className="w-full p-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+        ))
+      ) : (
+        <p className="text-gray-500 mt-2">No additional fields required.</p>
+      )}
+    </div>
+
+
+
+    
         {/* Required Documents */}
         <div className="mb-4">
           <label className="block text-gray-700 font-medium text-lg">Required Documents</label>

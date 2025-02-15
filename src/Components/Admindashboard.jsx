@@ -16,6 +16,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
 import logo from "../assets/logo.png";
 
+
 const Sidebar = ({ onNavigate }) => {
   const [activePath, setActivePath] = useState("/");
 
@@ -44,6 +45,7 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
             { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" },
             { icon: <FaTasks />, label: "Required Documents", path: "/requireddocuments" },
+            { icon: <FaTasks />, label: "Documents Types", path: "/documenttable" },
 
             { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" },
             { icon: <FaFileAlt />, label: "Verify Documents", path: "/Verifydocuments" },

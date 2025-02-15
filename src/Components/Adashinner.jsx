@@ -1,147 +1,120 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React from "react";
-import { Line, Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-// import AdminDashboard from "./AdminDashboard"; // Importing AdminDashboard
+import { 
+  FaHourglassHalf, FaCheckCircle, FaTimesCircle, 
+  FaShoppingBag, FaFileDownload 
+} from "react-icons/fa";
+import { Line } from "react-chartjs-2";
+import { Chart as ChartJS, LineElement, PointElement, LinearScale, Title, Tooltip, Legend, CategoryScale } from "chart.js";
 
-import usersIcon from "../assets/Login.png";
-import revenueIcon from "../assets/Login.png";
-import subscriptionsIcon from "../assets/Login.png";
-
-// Register Chart.js components
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Legend);
 
 const Adashinner = () => {
-  // Line chart data
-  const userActivityData = {
+  const chartData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
     datasets: [
       {
-        label: "Active Users",
-        data: [120, 200, 150, 300, 250, 400],
-        borderColor: "blue",
+        label: "New PAN Process",
+        data: [10, 20, 30, 40, 50, 60],
+        borderColor: "red",
+        fill: false,
+      },
+      {
+        label: "CSF PAN Process",
+        data: [5, 15, 25, 35, 45, 55],
+        borderColor: "green",
         fill: false,
       },
     ],
   };
 
-  // Bar chart data
-  const salesData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Requests",
-        data: [100, 150, 200, 250, 300, 350],
-        backgroundColor: "rgb(187, 247, 208)",
-      },
-    ],
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar & Dashboard */}
-      {/* <AdminDashboard /> */}
-
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Total Vendors Card */}
-          <div className="bg-green-200 p-4 rounded shadow flex items-center">
-            <img src={revenueIcon} alt="Revenue" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Vendors</h2>
-              <p className="text-xl">₹2058</p>
+    <div className="flex flex-col min-h-screen bg-gray-100 p-6">
+      {/* Cards Section */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Card Items */}
+        {[
+          { title: "New Aadhar Process", color: "orange", icon: FaHourglassHalf },
+          { title: "PAN Process", color: "orange", icon: FaHourglassHalf },
+          { title: "New PAN Objection", color: "red", icon: FaTimesCircle },
+          { title: "Cast Certificate", color: "orange", icon: FaTimesCircle },
+          { title: "Cast Validity", color: "green", icon: FaCheckCircle },
+          { title: "Birth Certificate", color: "green", icon: FaCheckCircle },
+          { title: "Complaint Pending", color: "gray", icon: FaShoppingBag },
+          { title: "Download Certificate", color: "blue", icon: FaFileDownload, text: "Click Here" },
+        ].map(({ title, color, icon: Icon, text }, index) => (
+          <div key={index} className={`flex items-center bg-${color}-200 p-4 rounded shadow`}>
+            <div className={`bg-${color}-500 text-white p-3 rounded`}>
+              <Icon size={24} />
+            </div>
+            <div className="ml-4">
+              <h2 className="text-lg font-semibold">{title}</h2>
+              {text ? (
+                <p className="text-blue-600 font-semibold cursor-pointer">{text}</p>
+              ) : (
+                <p className="text-xl">10</p>
+              )}
             </div>
           </div>
+        ))}
+      </div>
 
-          {/* Total Transactions Card */}
-          <div className="bg-yellow-200 p-4 rounded shadow flex items-center">
-            <img src={subscriptionsIcon} alt="Transactions" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Transactions</h2>
-              <p className="text-xl">398</p>
-            </div>
-          </div>
-
-          {/* Total Categories Card */}
-          <div className="bg-blue-200 p-4 rounded shadow flex items-center">
-            <img src={usersIcon} alt="Categories" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Categories</h2>
-              <p className="text-xl">5032</p>
-            </div>
-          </div>
-
-          {/* Total Subcategories Card */}
-          <div className="bg-green-200 p-4 rounded shadow flex items-center">
-            <img src={revenueIcon} alt="Subcategories" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Subcategories</h2>
-              <p className="text-xl">₹2058</p>
-            </div>
-          </div>
-
-          {/* Total Users Card */}
-          <div className="bg-blue-200 p-4 rounded shadow flex items-center">
-            <img src={usersIcon} alt="Users" className="w-12 h-12 mr-4" />
-            <div>
-              <h2 className="text-lg font-semibold">Total Users</h2>
-              <p className="text-xl">5032</p>
-            </div>
+      {/* Graph & Table Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Chart Section */}
+        <div className="bg-white p-6 rounded shadow">
+          <h2 className="text-xl font-semibold mb-4">Documents Process Statistics</h2>
+          <div className="h-64">
+            <Line data={chartData} options={chartOptions} />
           </div>
         </div>
+{/* Customer Summary Table */}
+<div className="bg-white p-4 rounded shadow overflow-hidden">
+  <h2 className="text-xl font-semibold">Customer Summary</h2>
+  <div className="overflow-y-auto max-h-64">
+    <table className="min-w-full mt-4 border-collapse">
+      <thead className="sticky top-0 bg-gray-200">
+        <tr>
+          <th className="p-2 border">Name</th>
+          <th className="p-2 border">Email</th>
+          <th className="p-2 border">Phone</th>
+          <th className="p-2 border">Category</th>
+          <th className="p-2 border">Documents</th>
+        </tr>
+      </thead>
+      <tbody>
+        {[
+          { name: "John Doe", category: "Business", docs: "ID Proof" },
+          { name: "Jane Smith", category: "Individual", docs: "Passport" },
+          { name: "Michael Johnson", category: "Corporate", docs: "License" },
+          { name: "Sarah Lee", category: "Freelancer", docs: "PAN Card" },
+          { name: "Chris Martin", category: "Startup", docs: "Tax Documents" }
+        ].map((customer, index) => (
+          <tr
+            key={index}
+            className={`border ${index % 2 === 0 ? "bg-gray-100" : "bg-white"}`}
+          >
+            <td className="p-2">{customer.name}</td>
+            <td className="p-2">{`${customer.name.toLowerCase().replace(" ", "")}@example.com`}</td>
+            <td className="p-2">123-456-7890</td>
+            <td className="p-2">{customer.category}</td>
+            <td className="p-2">{customer.docs}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold">User Activity</h2>
-            <Line data={userActivityData} />
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold">Vendor Data</h2>
-            <Bar data={salesData} />
-          </div>
-        </div>
-
-        {/* Customer Summary Table */}
-        <div className="bg-white p-4 rounded shadow mt-6">
-          <h2 className="text-xl font-semibold">Customer Summary</h2>
-          <table className="min-w-full mt-4">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2">Name</th>
-                <th className="p-2">Email</th>
-                <th className="p-2">Phone</th>
-                <th className="p-2">Subscription</th>
-              </tr>
-            </thead>
-            <tbody>
-              {["John Doe", "Jane Smith", "Michael Johnson"].map((name, index) => (
-                <tr key={index} className="border-t">
-                  <td className="p-2">{name}</td>
-                  <td className="p-2">{`${name.toLowerCase().replace(" ", "")}@example.com`}</td>
-                  <td className="p-2">123-456-7890</td>
-                  <td className="p-2">{index % 2 === 0 ? "Basic" : "Premium"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
       </div>
-    </div>
+   
   );
 };
 
