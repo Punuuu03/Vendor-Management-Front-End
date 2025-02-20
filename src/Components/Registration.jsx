@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Swal from "sweetalert2"; // Import SweetAlert
 import "../index.css"; // Ensure Tailwind & CSS are imported
 
 const Register = () => {
@@ -10,7 +11,7 @@ const Register = () => {
     password: "",
     phone: "",
   });
-  
+
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
@@ -43,23 +44,44 @@ const Register = () => {
         body: JSON.stringify(userData),
       });
       const data = await response.json();
+      
       if (response.ok) {
-        alert("Registration Successful!");
-        navigate("/");
+        Swal.fire({
+          title: "Registration Successful!",
+          text: "You can now log in.",
+          icon: "success",
+          confirmButtonColor: "#00234E",
+          confirmButtonText: "OK",
+        }).then(() => navigate("/"));
       } else {
-        alert(`Registration Failed: ${data.message}`);
+        Swal.fire({
+          title: "Registration Failed",
+          text: data.message || "Please try again.",
+          icon: "error",
+          confirmButtonColor: "#d33",
+        });
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      alert("Registration failed. Please try again.");
+      Swal.fire({
+        title: "Error",
+        text: "Something went wrong. Please try again later.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="flex w-3/5 bg-white rounded-lg shadow-xl overflow-hidden gap-6 p-6">
+    <div
+      className="flex justify-center items-center min-h-screen bg-cover bg-center"
+      style={{
+        backgroundImage: "url('https://web.edcrib.com/updates/wp-content/uploads/2024/08/edcrib-blog1-1024x683.jpeg')",
+      }}
+    >
+      <div className="flex w-3/4 h-[75vh] bg-white bg-opacity-90 rounded-lg shadow-xl overflow-hidden gap-8 p-8">
         {/* Left Column - Register Form */}
-        <div className="w-2/5 p-6 flex flex-col justify-center bg-gray-100 shadow-lg">
+        <div className="w-2/5 p-8 flex flex-col justify-center bg-white shadow-lg rounded-lg">
           <h2 className="text-2xl text-[#1e293b] font-bold mb-4 text-center">Register</h2>
           <form onSubmit={handleSubmit}>
             <input type="text" name="name" placeholder="Name" className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onChange={handleChange} required />
@@ -72,12 +94,12 @@ const Register = () => {
         </div>
 
         {/* Right Column - Document List */}
-        <div className="w-3/5 p-6 bg-gray-100 shadow-lg border border-gray-200 overflow-auto max-h-96">
+        <div className="w-3/5 p-8 bg-white shadow-lg border border-gray-200 overflow-y-auto max-h-[80vh] rounded-lg">
           <h2 className="text-2xl text-[#00234E] font-bold mb-4 text-center">Government Document Services</h2>
-          <ul className="space-y-2">
+          <ul className="grid grid-cols-2 gap-6">
             {categories.map((category) => (
-              <li key={category.category_id} className="flex items-center space-x-2 text-gray-700 border-b pb-1">
-                <span className="text-black">⚫</span>
+              <li key={category.category_id} className="flex items-center space-x-2 text-gray-700 border-b pb-2">
+                <span className="text-black text-sm">⚫</span>
                 <span>{category.category_name}</span>
               </li>
             ))}

@@ -44,55 +44,61 @@ const Categories = () => {
   };
 
   return (
-    <div className="bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6">
-      <section className="relative bg-orange-300 text-black py-16 px-6 text-center shadow-md">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold -mt-9 mb-1">Government Document Services</h1>
-          <p className="text-lg -mb-10 text-gray-900">
-            Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
-          </p>
+    <div className="flex">
+      {/* Sidebar Placeholder to Avoid Overlapping */}
+      <div className="w-[300px] hidden md:block"></div>
+
+      {/* Main Content */}
+      <div className="flex-1 bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6 pt-10">
+        <section className="relative bg-orange-300 text-black py-16 px-6 text-center shadow-md">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold -mt-9 mb-1">Government Document Services</h1>
+            <p className="text-lg -mb-10 text-gray-900">
+              Apply for various government documents quickly and hassle-free. Select a category below to proceed with your application.
+            </p>
+          </div>
+        </section>
+
+        {/* Title or Back Button */}
+        <div className="max-w-7xl mx-auto mt-6 flex justify-center">
+          <h2 className="text-2xl font-bold mb-5 text-gray-900">
+            {!selectedCategory ? "Select Categories" : "Select Sub Categories"}
+          </h2>
         </div>
-      </section>
 
-      {/* Title or Back Button */}
-      <div className="max-w-7xl mx-auto mt-6 flex items-center">
-        {!selectedCategory ? (
-          <h2 className="text-2xl font-bold text-left mb-5 text-gray-900">Select Categories</h2>
-        ) : (
-          <h2 className="text-2xl font-bold text-left mb-5 text-gray-900">Select SubCategories</h2>
 
-        )}
-      </div>
-
-      {/* Categories & Subcategories Grid */}
-      <div className="grid grid-cols-3 gap-4 w-full max-w-7xl mx-auto mt-4">
-        {!selectedCategory ? (
-          categories.map((category) => (
-            <div
-              key={category.category_id}
-              className="flex items-center w-full p-4 rounded-lg shadow-md cursor-pointer transition-all duration-300 bg-gray-100 hover:bg-orange-200"
-              onClick={() => fetchSubcategories(category.category_id, category.category_name)}
-            >
-              <FaFileAlt className="text-2xl text-orange-500" />
-              <span className="ml-4 text-lg font-medium">{category.category_name}</span>
-            </div>
-          ))
-        ) : (
-          subcategories.length > 0 ? (
-            subcategories.map((sub) => (
+        {/* Categories & Subcategories Grid */}
+        <div className="grid grid-cols-3 gap-4 w-full max-w-7xl mx-auto mt-4">
+          {!selectedCategory ? (
+            categories.map((category) => (
               <div
-                key={sub.subcategory_id}
-                className="flex items-center w-full p-4 rounded-lg shadow-md cursor-pointer transition-all duration-300 bg-gray-100 hover:bg-orange-200"
-                onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
+                key={category.category_id}
+                className="flex items-center w-full p-4 rounded-lg shadow-xl cursor-pointer transition-all duration-300 bg-gray-100 hover:bg-orange-200"
+                onClick={() => fetchSubcategories(category.category_id, category.category_name)}
               >
                 <FaFileAlt className="text-2xl text-orange-500" />
-                <span className="ml-4 text-lg font-medium">{sub.subcategory_name}</span>
+                <span className="ml-4 text-lg font-medium">{category.category_name}</span>
               </div>
+
             ))
           ) : (
-            <p className="text-lg text-gray-600 text-center w-full">No subcategories found.</p>
-          )
-        )}
+            subcategories.length > 0 ? (
+              subcategories.map((sub) => (
+                <div
+                  key={sub.subcategory_id}
+                  className="flex items-center w-full p-4 rounded-lg shadow-xl cursor-pointer transition-all duration-300 bg-orange-200 hover:bg-white"
+                  onClick={() => handleSubcategorySelect(sub.subcategory_id, sub.subcategory_name, selectedCategory.categoryId, selectedCategory.categoryName)}
+                >
+                  <FaFileAlt className="text-2xl text-[#00234E]" />
+                  <span className="ml-4 text-lg font-medium">{sub.subcategory_name}</span>
+                </div>
+
+              ))
+            ) : (
+              <p className="text-lg text-gray-600 text-center w-full">No subcategories found.</p>
+            )
+          )}
+        </div>
       </div>
     </div>
   );

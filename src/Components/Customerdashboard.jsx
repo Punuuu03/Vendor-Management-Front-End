@@ -2,14 +2,25 @@
 /* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  FaPlus,
+  FaList,
+  FaUserShield,
+  FaFileAlt,
+  FaTasks,
+  FaExchangeAlt,
+  FaSignOutAlt,
+  FaCalendarAlt,
+  FaTachometerAlt,
+  FaClipboardList,
+  FaCheckCircle
+} from "react-icons/fa";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
 import logo from "../assets/logo.png";
-import {  FaTachometerAlt, FaClipboardList,FaFileAlt, FaCheckCircle } from "react-icons/fa";
-import { FaUserShield } from "react-icons/fa";
 
 
-const Sidebar= ({ onNavigate }) => {
+const Sidebar = ({ onNavigate }) => {
   const [activePath, setActivePath] = useState("/");
 
   const handleNavigation = (path) => {
@@ -18,39 +29,35 @@ const Sidebar= ({ onNavigate }) => {
   };
 
   return (
-    <div className="w-1/5 bg-[#00234E] text-white shadow-lg p-4 min-h-screen">
-     <div className="flex flex-col items-center mb-6">
-     <img
-  src={logo}
-  alt="Logo"
-  className="[h-10px] w-[200px] mb-2 "
-/>
-
-  {/* <h1 className="text-xl font-bold">Vendor Management</h1> */}
-</div>
+    <div className="w-1/5 bg-[#00234E] text-white shadow-lg p-4 min-h-screen fixed top-0 left-0 h-full">
+      <div className="flex flex-col items-center mb-6">
+        <img
+          src={logo}
+          alt="Logo"
+          className="[h-10px] w-[200px] mb-2"
+        />
+      </div>
 
       <nav className="mt-6">
         <ul>
           {[
 
 
-                      { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Cdashinner" },  // Dashboard icon
-                      { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
 
-                      { icon: <FaClipboardList />, label: "Applications", path: "/customerapply" },  // Clipboard/list icon for applications
-                      
-                      { icon: <FaCheckCircle />, label: "Status", path: "/status" },  // Check-circle icon for status updates
+            { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Cdashinner" },  // Dashboard icon
+            { icon: <FaTachometerAlt />, label: "Check Application", path: "/Checkapplication" },  // Dashboard icon
+            { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
+
+            { icon: <FaClipboardList />, label: "Applications", path: "/customerapply" },  // Clipboard/list icon for applications
+
+            // { icon: <FaCheckCircle />, label: "Status", path: "/status" },  // Check-circle icon for status updates
 
 
-                      
-           
-            // { icon: <FaTasks />, label: "Distributor Assign", path: "/distributor-assign" },
           ].map((item, index) => (
             <li
               key={index}
-              className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 shadow-md ${
-                activePath === item.path ? "bg-white text-black border-l-4 border-blue-600" : "bg-gray-600 hover:bg-gray-400"
-              }`}
+              className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 shadow-md ${activePath === item.path ? "bg-white text-black border-l-4 border-blue-600" : "bg-gray-600 hover:bg-gray-400"
+                }`}
               onClick={() => handleNavigation(item.path)}
             >
               <span className="mr-3 text-lg">{item.icon}</span>
@@ -62,7 +69,6 @@ const Sidebar= ({ onNavigate }) => {
     </div>
   );
 };
-
 const Customerdashboard = ({ children }) => {
   const [user, setUser] = useState({});
   const [userEmail, setUserEmail] = useState("");
@@ -71,29 +77,28 @@ const Customerdashboard = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const email = localStorage.getItem("userEmail");
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    if (email) {
-      setUserEmail(email);
+    const token = localStorage.getItem("token"); // Assuming token is stored as "user"
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token); // Decode the token
+        console.log("Decoded Token:", decodedToken); // Debugging
+        setUserEmail(decodedToken.email); // Extract email from the token
+      } catch (error) {
+        console.error("Invalid token:", error);
+      }
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("userEmail");
-    window.location.href = "/login";
+    window.location.href = "/";
   };
-
   return (
     <div className="flex min-h-screen bg-[#f3f4f6]">
       <Sidebar onNavigate={(path) => navigate(path)} />
       <div className="flex-1 p-6">
-        {/* Top Section */}
-        <div className="flex items-center justify-between bg-[#00234E] text-white p-4 rounded-md shadow-md">
+        {/* Top Section (Navbar) */}
+        <div className="flex items-center justify-between bg-[#00234E] text-white p-4 rounded-md shadow-md ml-[310px] fixed top-0 left-0 w-[80%] z-10">
           <span className="text-lg font-bold">Customer Dashboard</span>
 
           {/* Profile Section */}
@@ -106,16 +111,18 @@ const Customerdashboard = ({ children }) => {
             />
             {dropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-10">
-                <div className="p-4 border-b">
+                <div className="p-4 border-b text-center">
                   {userEmail ? (
-                    <p className="text-lg mb-4"><strong>{userEmail}</strong></p>
+                    <p className="text-lg bg-blue-600 text-white p-2 rounded-md">
+                      <strong>{userEmail}</strong>
+                    </p>
                   ) : (
                     <p className="text-lg mb-4">No user logged in.</p>
                   )}
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  className="w-32 px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 block mx-auto mb-2"
                 >
                   Logout
                 </button>
@@ -128,6 +135,7 @@ const Customerdashboard = ({ children }) => {
         <div className="mt-6">{children}</div>
       </div>
     </div>
+
   );
 };
 

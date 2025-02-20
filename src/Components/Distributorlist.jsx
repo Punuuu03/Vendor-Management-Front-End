@@ -1,79 +1,160 @@
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import Swal from "sweetalert2";
 import axios from "axios";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const DistributorList = () => {
     const [distributors, setDistributors] = useState([]);
+    const [editingId, setEditingId] = useState(null);
+    const [updatedName, setUpdatedName] = useState("");
+    const navigate = useNavigate(); // For navigation
+
+    const apiUrl = "http://localhost:3000/users/distributors";
 
     useEffect(() => {
-        axios.get("http://localhost:3000/users/distributors")
-            .then(response => {
-                setDistributors(response.data);
-            })
-            .catch(error => {
-                console.error("There was an error fetching the data!", error);
-            });
+        fetchDistributors();
     }, []);
 
-    const updateStatus = (userId, status) => {
-        axios.patch(`http://localhost:3000/users/status/${userId}`, { status })
-            .then(response => {
-                if (response.data === "User status updated to " + status) {
-                    setDistributors(distributors.map(distributor => 
-                        distributor.user_id === userId ? { ...distributor, user_login_status: status } : distributor
-                    ));
-                }
-            })
-            .catch(error => {
-                console.error("Error updating status!", error);
-            });
+    const fetchDistributors = async () => {
+        try {
+            const response = await axios.get(apiUrl);
+            setDistributors(response.data);
+        } catch (error) {
+            console.error("Error fetching distributors:", error);
+        }
+    };
+
+    const handleEditDistributor = (id, name) => {
+        setEditingId(id);
+        setUpdatedName(name);
+    };
+
+    const handleUpdateDistributor = async (id) => {
+        try {
+            await axios.patch(`${apiUrl}/${id}`, { name: updatedName });
+
+            setDistributors(
+                distributors.map((distributor) =>
+                    distributor.user_id === id ? { ...distributor, name: updatedName } : distributor
+                )
+            );
+
+            setEditingId(null);
+            setUpdatedName("");
+
+            Swal.fire("Updated", "Distributor updated successfully!", "success");
+        } catch (error) {
+            console.error("Error updating distributor:", error);
+            Swal.fire("Error", "Failed to update distributor", "error");
+        }
+    };
+
+    const handleDeleteDistributor = async (id) => {
+        const confirmDelete = await Swal.fire({
+            title: "Are you sure?",
+            text: "This distributor will be deleted permanently!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Yes, delete it!",
+        });
+
+        if (confirmDelete.isConfirmed) {
+            try {
+                await axios.delete(`${apiUrl}/${id}`);
+                setDistributors(distributors.filter((distributor) => distributor.user_id !== id));
+                Swal.fire("Deleted!", "Distributor has been deleted.", "success");
+            } catch (error) {
+                console.error("Error deleting distributor:", error);
+                Swal.fire("Error", "Failed to delete distributor", "error");
+            }
+        }
     };
 
     return (
-        <div className="container bg-white mx-auto p-6">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Distributor List</h1>
+        <div className="ml-[260px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+            {/* Top Section - Heading & Add Distributor Button */}
+            <div className="w-full max-w-7xl bg-white p-6 shadow-lg flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-800">Manage Distributors</h2>
+                <button
+                    onClick={() => navigate("/Distributoregister")}
+                    className="bg-green-500 text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-green-600 transition duration-200"
+                >
+                    <FaPlus /> Add Distributor
+                </button>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                    <thead className="bg-gray-300 sticky top-0">
-                        <tr>
-                            <th className="border p-2">User ID</th>
-                            <th className="border p-2">Name</th>
-                            <th className="border p-2">Email</th>
-                            <th className="border p-2">Phone</th>
-                            <th className="border p-2">Role</th>
-                            <th className="border p-2">Status</th>
-                            <th className="border p-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {distributors.map((distributor, index) => (
-                            <tr key={distributor.user_id} className={index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"}>
-                                <td className="border p-2">{distributor.user_id}</td>
-                                <td className="border p-2">{distributor.name}</td>
-                                <td className="border p-2">{distributor.email}</td>
-                                <td className="border p-2">{distributor.phone}</td>
-                                <td className="border p-2">{distributor.role}</td>
-                                <td className="border p-2">
-                                    <span className={`px-2 py-1 rounded-full text-white ${distributor.user_login_status === 'Approve' ? 'bg-green-500' : 'bg-red-500'}`}> 
-                                        {distributor.user_login_status} 
-                                    </span>
-                                </td>
-                                <td className="border p-2 flex gap-2">
-                                    <button onClick={() => updateStatus(distributor.user_id, 'Approve')} className="bg-green-500 text-white px-3 py-1 rounded flex items-center gap-1 hover:bg-green-600">
-                                        <FaCheckCircle /> Approve
-                                    </button>
-                                    <button onClick={() => updateStatus(distributor.user_id, 'Reject')} className="bg-red-500 text-white px-3 py-1 rounded flex items-center gap-1 hover:bg-red-600">
-                                        <FaTimesCircle /> Reject
-                                    </button>
-                                </td>
+            {/* Distributor List Section */}
+            <div className="w-full max-w-7xl bg-white p-6 shadow-lg mt-6">
+                <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Distributor List</h2>
+
+                {/* Scrollable Table Wrapper */}
+                <div className="overflow-y-auto max-h-60 border border-gray-300">
+                    <table className="w-full border-collapse">
+                        <thead className="bg-gray-300 text-black sticky top-0">
+                            <tr>
+                                <th className="p-3 text-left border-r border-gray-400">ID</th>
+                                <th className="p-3 text-left border-r border-gray-400">Name</th>
+                                <th className="p-3 text-left border-r border-gray-400">Email</th>
+                                <th className="p-3 text-center">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {distributors.length > 0 ? (
+                                distributors.map((distributor, index) => (
+                                    <tr key={distributor.user_id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
+                                        <td className="p-3 border-r border-gray-400">{distributor.user_id}</td>
+                                        <td className="p-3 border-r border-gray-400">
+                                            {editingId === distributor.user_id ? (
+                                                <input
+                                                    type="text"
+                                                    value={updatedName}
+                                                    onChange={(e) => setUpdatedName(e.target.value)}
+                                                    className="border border-gray-400 p-2 rounded"
+                                                />
+                                            ) : (
+                                                distributor.name
+                                            )}
+                                        </td>
+                                        <td className="p-3 border-r border-gray-400">{distributor.email}</td>
+                                        <td className="p-3 text-center">
+                                            {editingId === distributor.user_id ? (
+                                                <button
+                                                    onClick={() => handleUpdateDistributor(distributor.user_id)}
+                                                    className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
+                                                >
+                                                    Save
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleEditDistributor(distributor.user_id, distributor.name)}
+                                                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                                                >
+                                                    <FaEdit />
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => handleDeleteDistributor(distributor.user_id)}
+                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="4" className="p-3 text-center text-gray-500">
+                                        No distributors found
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

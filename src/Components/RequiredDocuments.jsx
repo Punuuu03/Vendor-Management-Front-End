@@ -1,8 +1,7 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
 const RequiredDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -16,57 +15,54 @@ const RequiredDocuments = () => {
   });
   const [editId, setEditId] = useState(null);
 
-  // Fetch documents
+  const apiUrl = "http://localhost:3000/required-documents";
+  const categoriesUrl = "http://localhost:3000/categories";
+  const subcategoriesUrl = "http://localhost:3000/subcategories/category/";
+
+  // Fetch required documents and categories
   useEffect(() => {
     fetchDocuments();
     fetchCategories();
   }, []);
 
-  // Fetch required documents
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/required-documents");
+      const response = await axios.get(apiUrl);
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
     }
   };
 
-  // Fetch categories
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/categories");
+      const response = await axios.get(categoriesUrl);
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
-  // Fetch subcategories based on selected category
   const fetchSubcategories = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`http://localhost:3000/subcategories/category/${categoryId}`);
-      
-      // Assuming response.data is already an array
-      setSubcategories(response.data);  
+      const response = await axios.get(`${subcategoriesUrl}${categoryId}`);
+      setSubcategories(response.data);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
       setSubcategories([]); // Clear the list on error
     }
   };
-  
-  // Handle category change
+
   const handleCategoryChange = (e) => {
     const selectedCategoryId = e.target.value;
     setFormData({ ...formData, category_id: selectedCategoryId, subcategory_id: "" });
     fetchSubcategories(selectedCategoryId);
   };
 
-  // Handle delete document
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/required-documents/${id}`);
+      await axios.delete(`${apiUrl}/${id}`);
       Swal.fire("Deleted!", "Document deleted successfully", "success");
       fetchDocuments();
     } catch (error) {
@@ -74,7 +70,6 @@ const RequiredDocuments = () => {
     }
   };
 
-  // Handle edit document
   const handleEdit = (doc) => {
     setEditId(doc.id);
     setFormData({
@@ -86,15 +81,14 @@ const RequiredDocuments = () => {
     setModalOpen(true);
   };
 
-  // Handle form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editId) {
-        await axios.put(`http://localhost:3000/required-documents/${editId}`, formData);
+        await axios.put(`${apiUrl}/${editId}`, formData);
         Swal.fire("Updated!", "Document updated successfully", "success");
       } else {
-        await axios.post("http://localhost:3000/required-documents", formData);
+        await axios.post(apiUrl, formData);
         Swal.fire("Added!", "Document added successfully", "success");
       }
       fetchDocuments();
@@ -107,95 +101,126 @@ const RequiredDocuments = () => {
   };
 
   return (
-    <div className="container bg-white mx-auto p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Required Documents</h1>
-        <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded">
-          Add Document
-        </button>
+    <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+      {/* Required Documents Section */}
+      <div className="w-full p-6">
+        <div className="w-full max-w-7xl bg-white p-6 shadow-lg">
+          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Manage Required Documents</h2>
+
+          {/* Add Document Button */}
+          <div className="flex justify-end mb-4">
+            <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded">
+              <FaPlus className="mr-2" /> Add Document
+            </button>
+          </div>
+
+          {/* Documents Table with Scroll */}
+          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+            <table className="w-full border-collapse">
+              <thead className="bg-gray-300 text-black">
+                <tr>
+                  <th className="p-3 text-left border-r border-gray-400">ID</th>
+                  <th className="p-3 text-left border-r border-gray-400">Category</th>
+                  <th className="p-3 text-left border-r border-gray-400">Subcategory</th>
+                  <th className="p-3 text-left border-r border-gray-400">Document Names</th>
+                  <th className="p-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {documents.length > 0 ? (
+                  documents.map((doc, index) => (
+                    <tr key={doc.id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
+                      <td className="p-3 border-r border-gray-400">{doc.id}</td>
+                      <td className="p-3 border-r border-gray-400">{doc.category.category_name}</td>
+                      <td className="p-3 border-r border-gray-400">{doc.subcategory.subcategory_name}</td>
+                      <td className="p-3 border-r border-gray-400">{doc.document_names}</td>
+                      <td className="p-3 text-center">
+                        <button
+                          onClick={() => handleEdit(doc)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(doc.id)}
+                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                        >
+                          <FaTrash />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="p-3 text-center text-gray-500">
+                      No documents found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div className="overflow-x-auto ">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-300 sticky top-0">
-            <tr>
-              <th className="border p-2">ID</th>
-              <th className="border p-2">Documents</th>
-              <th className="border p-2">Category</th>
-              <th className="border p-2">Subcategory</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents.map((doc, index) => (
-              <tr key={doc.id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-                <td className="border p-2 text-center">{doc.id}</td>
-                <td className="border p-2 text-center">{doc.document_names}</td>
-                <td className="border p-2 text-center">{doc.category.category_name}</td>
-                <td className="border p-2 text-center">{doc.subcategory.subcategory_name}</td>
-                <td className="border p-2 flex justify-center space-x-2">
-                  <FaEdit onClick={() => handleEdit(doc)} className="text-yellow-500 cursor-pointer" />
-                  <FaTrash onClick={() => handleDelete(doc.id)} className="text-red-500 cursor-pointer" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Modal for Adding/Editing Documents */}
+      {/* Add / Edit Document Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-1/3">
-            <h2 className="text-xl font-bold mb-4">{editId ? "Edit Document" : "Add Document"}</h2>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h3 className="text-xl font-bold mb-4">{editId ? "Edit Document" : "Add Document"}</h3>
             <form onSubmit={handleSubmit}>
-              {/* Category Dropdown */}
               <select
-                className="w-full border p-2 mb-2"
+                className="border p-2 rounded w-full mb-4"
                 value={formData.category_id}
                 onChange={handleCategoryChange}
               >
                 <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat.category_id} value={cat.category_id}>
-                    {cat.category_name}
+                {categories.map((category) => (
+                  <option key={category.category_id} value={category.category_id}>
+                    {category.category_name}
                   </option>
                 ))}
               </select>
-
-              {/* Subcategory Dropdown */}
               <select
-                className="w-full border p-2 mb-2"
+                className="border p-2 rounded w-full mb-4"
                 value={formData.subcategory_id}
                 onChange={(e) => setFormData({ ...formData, subcategory_id: e.target.value })}
-                disabled={!formData.category_id}
               >
                 <option value="">Select Subcategory</option>
-                {subcategories.map((sub) => (
-                  <option key={sub.subcategory_id} value={sub.subcategory_id}>
-                    {sub.subcategory_name}
+                {subcategories.map((subcategory) => (
+                  <option key={subcategory.subcategory_id} value={subcategory.subcategory_id}>
+                    {subcategory.subcategory_name}
                   </option>
                 ))}
               </select>
-
-              {/* Document Names */}
               <input
                 type="text"
-                placeholder="Document Names"
-                className="w-full border p-2 mb-2"
+                className="border p-2 rounded w-full mb-4"
+                placeholder="Enter document names"
                 value={formData.document_names}
                 onChange={(e) => setFormData({ ...formData, document_names: e.target.value })}
               />
-
-              <div className="flex justify-end space-x-2">
-                <button type="button" onClick={() => setModalOpen(false)} className="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
-                <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
     </div>
+
   );
 };
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
@@ -98,25 +97,24 @@ const Subcategories = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full   p-6 ">
-        {/* <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Manage Subcategories</h2> */}
-
+    <div className="ml-[260px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+      <div className="w-full p-6">
         <div className="flex justify-end -mt-10">
-          <button
-            onClick={() => setIsAdding(true)}
-            className="bg-[#00234E] text-white px-5 py-3  text-lg rounded-lg hover:opacity-90 transition duration-200 flex items-center"
-          >
-            <FaPlus className="mr-2" /> Add Subcategory
-          </button>
+
         </div>
       </div>
 
-      {/* Table */}
-      <div className="w-full max-w-7xl -mt-2 bg-white p-6  shadow-lg">
+
+      <div className="w-full max-w-7xl -mt-2 bg-white p-6 shadow-lg">
+        <button
+          onClick={() => setIsAdding(true)}
+          className="bg-[#00234E] text-white px-5 py-3 text-lg rounded-lg hover:opacity-90 transition duration-200 flex items-center"
+        >
+          <FaPlus className="mr-2" /> Add Subcategory
+        </button>
         <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Subcategory List</h2>
 
-        <div className="overflow-y-auto max-h-60 border border-gray-300">
+        <div className="overflow-y-auto max-h-[400px] border border-gray-300"> {/* Set max-height to 100px */}
           <table className="w-full border-collapse">
             <thead className="bg-gray-300 text-black sticky top-0">
               <tr>
@@ -125,7 +123,7 @@ const Subcategories = () => {
                 <th className="p-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="overflow-y-auto"> {/* This makes the tbody scrollable */}
               {subcategories.length > 0 ? (
                 subcategories.map((sub, index) => (
                   <tr key={sub.subcategory_id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
@@ -179,37 +177,33 @@ const Subcategories = () => {
         </div>
       </div>
 
-      {/* Popup for Adding Subcategory */}
+
       {isAdding && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h3 className="text-xl font-bold mb-4">Add Subcategory</h3>
             <input
-            type="text"
-            placeholder="Enter subcategory name"
-            className="border p-2 rounded w-full mb-4"
-            value={newSubcategory.subcategory_name}
-            onChange={(e) => setNewSubcategory({ ...newSubcategory, subcategory_name: e.target.value })}
-          />
-          <select
-            className="border p-2 rounded w-full mb-4"
-            value={newSubcategory.category_id}
-            onChange={(e) => setNewSubcategory({ ...newSubcategory, category_id: e.target.value })}
-          >
-            <option value="">Select Category</option>
-            {categories.map((category) => (
-              <option key={category.category_id} value={category.category_id}>
-                {category.category_name}
-              </option>
-            ))}
-          </select>
-          <div className="flex gap-4">
-            <button onClick={addSubcategory} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-              Save
-            </button>
-            <button onClick={() => setIsAdding(false)} className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">
-              Cancel
-            </button>
+              type="text"
+              placeholder="Enter subcategory name"
+              className="border p-2 rounded w-full mb-4"
+              value={newSubcategory.subcategory_name}
+              onChange={(e) => setNewSubcategory({ ...newSubcategory, subcategory_name: e.target.value })}
+            />
+            <select
+              className="border p-2 rounded w-full mb-4"
+              value={newSubcategory.category_id}
+              onChange={(e) => setNewSubcategory({ ...newSubcategory, category_id: e.target.value })}
+            >
+              <option value="">Select Category</option>
+              {categories.map((category) => (
+                <option key={category.category_id} value={category.category_id}>
+                  {category.category_name}
+                </option>
+              ))}
+            </select>
+            <div className="flex gap-4">
+              <button onClick={addSubcategory} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Save</button>
+              <button onClick={() => setIsAdding(false)} className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500">Cancel</button>
             </div>
           </div>
         </div>

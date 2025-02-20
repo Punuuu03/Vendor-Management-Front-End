@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaRegFileAlt,FaCheck, FaTimes } from "react-icons/fa"; // Importing document icon
+import { FaRegFileAlt, FaCheck, FaTimes } from "react-icons/fa";
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(""); // State for status filter
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
   useEffect(() => {
     axios
       .get("http://localhost:3000/documents/list")
-      .then((response) => setDocuments(response.data.documents))
+      .then((response) => {
+        const sortedDocuments = response.data.documents.sort(
+          (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
+        );
+        setDocuments(sortedDocuments); // Ensure documents are sorted from newest to oldest
+      })
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
@@ -23,6 +30,30 @@ const VerifyDocuments = () => {
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
   }, []);
+
+  // Function to handle status filter change
+  const handleStatusFilterChange = (e) => {
+    setStatusFilter(e.target.value);
+  };
+
+  // Function to handle search query change
+  const handleSearchQueryChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
+  };
+
+  // Filter documents based on selected status
+  const filteredDocuments = documents
+    .filter((doc) =>
+      statusFilter ? doc.status.toLowerCase() === statusFilter.toLowerCase() : true
+    )
+    .filter((doc) =>
+      searchQuery
+        ? doc.document_id.toLowerCase().includes(searchQuery) ||
+        doc.name.toLowerCase().includes(searchQuery) ||
+        doc.email.toLowerCase().includes(searchQuery) ||
+        doc.phone.toLowerCase().includes(searchQuery)
+        : true
+    );
 
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
@@ -85,99 +116,145 @@ const VerifyDocuments = () => {
   };
 
   return (
-    <div className="container max-w-6xl bg-white p-6  ">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Verify Documents</h1>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-300 sticky top-0">
-            <tr>
-              <th className="border p-2">Document Id</th>
-              <th className="border p-2">Category</th>
-              <th className="border p-2">Subcategory</th>
-              <th className="border p-2">Name</th>
-              <th className="border p-2">Email</th>
-              <th className="border p-2">Phone</th>
-              <th className="border p-2">Address</th>
-              <th className="border p-2">Documents</th>
-              <th className="border p-2">Verification</th>
-              <th className="border p-2">Actions</th>
-              <th className="border p-2">Assign Distributor</th>
-              <th className="border p-2">Certificate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents.map((doc) => (
-              <tr key={doc.document_id} className="border-t hover:bg-gray-100">
-                <td className="border p-2 text-center">{doc.document_id}</td>
-                <td className="border p-2">{doc.category_name}</td>
-                <td className="border p-2">{doc.subcategory_name}</td>
-                <td className="border p-2">{doc.name}</td>
-                <td className="border p-2">{doc.email}</td>
-                <td className="border p-2">{doc.phone}</td>
-                <td className="border p-2">{doc.address}</td>
-                <td className="border p-2">
-                  <div className="flex justify-center">
-                    {doc.documents?.map((file, index) => (
-                      <a key={index} href={file.file_path} target="_blank" rel="noopener noreferrer">
-                        <FaRegFileAlt className="text-blue-500 text-lg" />
-                      </a>
-                    ))}
-                  </div>
-                </td>
-                <td className="border p-2">
-                  <span className={`px-3 py-1 rounded-full text-white text-sm ${
-                    doc.status === "Approved" ? "bg-green-500" :
-                    doc.status === "Rejected" ? "bg-red-500" :
-                    "bg-blue-500"
-                  }`}>
-                    {doc.status}
-                  </span>
-                </td>
-                
-<td className="p-3 flex justify-center space-x-2">
-  <button 
-    onClick={() => handleUpdateStatus(doc.document_id, "Approved")} 
-    className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center"
-  >
-    <FaCheck className="text-white" />
-  </button>
-  <button 
-    onClick={() => handleUpdateStatus(doc.document_id, "Rejected")} 
-    className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center"
-  >
-    <FaTimes className="text-white" />
-  </button>
-  <button 
-    onClick={() => handleUpdateStatus(doc.document_id, "Completed")} 
-    className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center"
-  >
-    <FaCheck className="text-white" />
-  </button>
-</td>
+    <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+      <div className="w-full p-6">
+        <h2 className="text-xl font-bold text-center mb-6 text-gray-800">Verify Documents</h2>
 
-                <td className="border p-2">
-                  <select onChange={(e) => handleAssignDistributor(doc.document_id, e.target.value)} value={doc.distributor_id || ""} className="p-2 border rounded w-full">
-                    <option value="">Select</option>
-                    {distributors.map((dist) => (
-                      <option key={dist.user_id} value={dist.user_id}>{dist.name}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="border p-2">
-                  {getCertificateByDocumentId(doc.document_id) && (
-                    <div className="flex justify-center">
-                      <button onClick={() => handleViewCertificate(doc.document_id)} className="bg-blue-500 text-white px-3 py-1 rounded">
-                        <FaRegFileAlt />
-                      </button>
-                    </div>
-                  )}
-                </td>
+        {/* Flexbox container for Status Filter and Search Bar */}
+        <div className="mb-4 flex justify-between items-center">
+          {/* Status Filter Dropdown */}
+          <div className="mr-4">
+            <label htmlFor="statusFilter" className="mr-2 text-sm">Filter by Status:</label>
+            <select
+              id="statusFilter"
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              className="p-2 border rounded text-sm"
+            >
+              <option value="">All</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
+
+          {/* Search Bar */}
+          <input
+            type="text"
+            placeholder="Search documents..."
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            className="p-2 border rounded w-[200px] text-sm" // Decreased the width for the search bar
+          />
+        </div>
+
+        <div className="table-container overflow-x-auto overflow-y-auto max-h-[550px]">
+          <table className="table border-collapse border border-gray-300 min-w-full">
+            <thead className="sticky-header">
+              <tr>
+                <th className="border p-2 text-center text-sm font-semibold">Sr No.</th>
+                <th className="border p-2 text-center text-sm font-semibold">Document Id</th>
+                <th className="border p-2 text-sm font-semibold">Category</th>
+                <th className="border p-2 text-sm font-semibold">Subcategory</th>
+                <th className="border p-2 text-sm font-semibold">Name</th>
+                <th className="border p-2 text-sm font-semibold">Email</th>
+                <th className="border p-2 text-sm font-semibold">Phone</th>
+                <th className="border p-2 text-sm font-semibold">Address</th>
+                <th className="border p-2 text-sm font-semibold">Documents</th>
+                <th className="border p-2 text-sm font-semibold">Documents Fields</th>
+                <th className="border p-2 text-sm font-semibold">Verification</th>
+                <th className="border p-2 text-sm font-semibold">Actions</th>
+                <th className="border p-2 text-sm font-semibold">Assign Distributor</th>
+                <th className="border p-2 text-sm font-semibold">Certificate</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredDocuments.map((doc, index) => (
+                <tr key={doc.document_id} className="border-t hover:bg-gray-100">
+                  <td className="border p-2 text-center text-sm">{index + 1}</td>
+                  <td className="border p-2 text-center text-sm">{doc.document_id}</td>
+                  <td className="border p-2 text-sm">{doc.category_name}</td>
+                  <td className="border p-2 text-sm">{doc.subcategory_name}</td>
+                  <td className="border p-2 text-sm">{doc.name}</td>
+                  <td className="border p-2 text-sm">{doc.email}</td>
+                  <td className="border p-2 text-sm">{doc.phone}</td>
+                  <td className="border p-2 text-sm">{doc.address}</td>
+
+                  <td className="border p-2">
+                    <div className="flex justify-center">
+                      {doc.documents?.map((file, index) => (
+                        <a key={index} href={file.file_path} target="_blank" rel="noopener noreferrer">
+                          <FaRegFileAlt className="text-blue-500 text-lg" />
+                        </a>
+                      ))}
+                    </div>
+                  </td>
+                  <td>{JSON.stringify(doc.document_fields)}</td>
+
+                  <td className="border p-2 text-sm">
+                    <span
+                      className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Approved"
+                        ? "bg-green-500"
+                        : doc.status === "Rejected"
+                          ? "bg-red-500"
+                          : "bg-blue-500"
+                        }`}
+                    >
+                      {doc.status}
+                    </span>
+                  </td>
+                  <td className="p-3 flex justify-center space-x-2 text-sm">
+                    <button
+                      onClick={() => handleUpdateStatus(doc.document_id, "Approved")}
+                      className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
+                    >
+                      <FaCheck className="text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(doc.document_id, "Rejected")}
+                      className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition"
+                    >
+                      <FaTimes className="text-white" />
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
+                      className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                    >
+                      <FaCheck className="text-white" />
+                    </button>
+                  </td>
+
+                  <td className="border p-2 text-sm">
+                    <select
+                      onChange={(e) => handleAssignDistributor(doc.document_id, e.target.value)}
+                      value={doc.distributor_id || ""}
+                      className="p-2 border rounded w-full hover:border-blue-500 transition text-sm"
+                    >
+                      <option value="">Select</option>
+                      {distributors.map((dist) => (
+                        <option key={dist.user_id} value={dist.user_id}>
+                          {dist.name}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border p-2 text-sm">
+                    {getCertificateByDocumentId(doc.document_id) ? (
+                      <button
+                        onClick={() => handleViewCertificate(doc.document_id)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                      >
+                        View Certificate
+                      </button>
+                    ) : (
+                      <span>No Certificate</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

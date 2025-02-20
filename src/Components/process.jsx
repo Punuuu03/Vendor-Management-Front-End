@@ -24,8 +24,9 @@ const cardData = [
 
 const Process = () => {
   return (
-    <section className="bg-gray-300 py-12 px-6">
-      <h2 className="text-3xl font-bold text-center text-black mb-8">How It Works</h2>
+    <div className="flex flex-col min-h-screen bg-gray-100 p-6 ml-[300px]"> {/* Added ml-[200px] for margin-left */}
+
+      <h2 className="text-2xl font-bold mb-4">How It Works</h2>
       <div className="flex flex-wrap justify-center mt-12">
         {cardData.map((card) => (
           <div key={card.id} className="w-full md:w-1/3 px-6 mb-8">
@@ -45,8 +46,7 @@ const Process = () => {
           </div>
         ))}
       </div>
-    </section>
-  );
+    </div>);
 };
 
 export default Process;
