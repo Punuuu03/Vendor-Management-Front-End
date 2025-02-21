@@ -92,10 +92,11 @@ const VerifyDocuments = () => {
   };
 
 
-
-  const handleViewInvoice = (documentId) => {
-    navigate(`/Invoice/${documentId}`);
+  const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
+    navigate(`/Invoice/${documentId}`, { state: { categoryId, subcategoryId } });
   };
+
+  
   const getCertificateByDocumentId = (documentId) => {
     const matchedCertificate = certificates.find(
       (cert) => cert.document_id === documentId
