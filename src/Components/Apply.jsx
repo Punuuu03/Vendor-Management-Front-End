@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import Swal from 'sweetalert2';
+
 
 const Apply = () => {
   const [documentNames, setDocumentNames] = useState([]);
@@ -55,9 +57,9 @@ const Apply = () => {
       setFormData((prev) => ({
         ...prev,
         user_id: Number(userData.user_id),
-        name: userData.name || "",
-        email: userData.email || "",
-        phone: userData.phone || "",
+        // name: userData.name || "",
+        // email: userData.email || "",
+        // phone: userData.phone || "",
       }));
     }
   }, [userData]);
@@ -138,12 +140,15 @@ const Apply = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+ 
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Create FormData
     const formDataToSend = new FormData();
-
+  
     // Add each field individually to FormData
     formDataToSend.append("user_id", formData.user_id.toString());
     formDataToSend.append("category_id", formData.category_id.toString());
@@ -155,17 +160,17 @@ const Apply = () => {
     formDataToSend.append("phone", formData.phone);
     formDataToSend.append("address", formData.address);
     formDataToSend.append("document_fields", JSON.stringify(formData.document_fields));
-
+  
     // Append files
     Object.entries(selectedFiles).forEach(([docName, file]) => {
       if (file && file instanceof File) {
         formDataToSend.append("files", file);
       }
     });
-
+  
     try {
       console.log("Submitting form data...");
-
+  
       const response = await axios.post(
         "http://localhost:3000/documents/upload",
         formDataToSend,
@@ -175,18 +180,39 @@ const Apply = () => {
           },
         }
       );
-
+  
       console.log("Upload successful:", response.data);
-      alert("Your application has been submitted successfully!");
+  
+      // SweetAlert for success with navigation
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Your application has been submitted successfully!',
+        confirmButtonColor: '#3085d6',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to customerapply page
+          window.location.href = '/customerapply';
+        }
+      });
+  
     } catch (error) {
       console.error("Submission Error:", {
         message: error.response?.data?.message || error.message,
         data: error.response?.data,
         status: error.response?.status
       });
-      alert(`Failed to submit application: ${error.response?.data?.message || error.message}`);
+  
+      // SweetAlert for error
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: error.response?.data?.message || error.message,
+        confirmButtonColor: '#d33',
+      });
     }
   };
+  
 
   return (
 
@@ -229,7 +255,7 @@ const Apply = () => {
                 name="name"
                 onChange={handleChange}
                 value={formData.name || ""}
-                className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-gray-100 shadow-md"
+                className="w-full mt-2 p-3 border border-gray-300 rounded-lg bg-white shadow-md"
                 placeholder="Enter Full Name"
               />
             </div>

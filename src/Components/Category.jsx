@@ -46,10 +46,10 @@ const Categories = () => {
   return (
     <div className="flex">
       {/* Sidebar Placeholder to Avoid Overlapping */}
-      <div className="w-[300px] hidden md:block"></div>
+      <div className="w-[340px] hidden md:block"></div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6 pt-10">
+      <div className="flex-1 bg-gray-100 text-[#1e293b] min-h-screen animate-fadeIn p-6 pt-12">
         <section className="relative bg-orange-300 text-black py-16 px-6 text-center shadow-md">
           <div className="max-w-7xl mx-auto">
             <h1 className="text-3xl font-bold -mt-9 mb-1">Government Document Services</h1>

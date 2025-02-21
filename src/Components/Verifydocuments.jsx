@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaRegFileAlt, FaCheck, FaTimes } from "react-icons/fa";
+import { FaRegFileAlt, FaFileInvoice,FaCheck, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom"; 
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -8,6 +9,7 @@ const VerifyDocuments = () => {
   const [certificates, setCertificates] = useState([]);
   const [statusFilter, setStatusFilter] = useState(""); // State for status filter
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -89,6 +91,11 @@ const VerifyDocuments = () => {
     }
   };
 
+
+
+  const handleViewInvoice = (documentId) => {
+    navigate(`/Invoice/${documentId}`);
+  };
   const getCertificateByDocumentId = (documentId) => {
     const matchedCertificate = certificates.find(
       (cert) => cert.document_id === documentId
@@ -114,6 +121,10 @@ const VerifyDocuments = () => {
       alert("Failed to fetch certificate.");
     }
   };
+
+
+
+  
 
   return (
     <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
@@ -166,6 +177,7 @@ const VerifyDocuments = () => {
                 <th className="border p-2 text-sm font-semibold">Actions</th>
                 <th className="border p-2 text-sm font-semibold">Assign Distributor</th>
                 <th className="border p-2 text-sm font-semibold">Certificate</th>
+                <th className="border p-2 text-sm font-semibold">Invoice</th>
               </tr>
             </thead>
             <tbody>
@@ -249,7 +261,23 @@ const VerifyDocuments = () => {
                     ) : (
                       <span>No Certificate</span>
                     )}
+
+
+
                   </td>
+
+
+                  {/* New Invoice Button Column */}
+                  <td className="border p-2 text-center">
+                    <button
+                      onClick={() => handleViewInvoice(doc.document_id)}
+                      className="bg-indigo-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-indigo-600 transition"
+                    >
+                      <FaFileInvoice className="mr-1" /> Invoice
+                    </button>
+                  </td>
+
+                  
                 </tr>
               ))}
             </tbody>

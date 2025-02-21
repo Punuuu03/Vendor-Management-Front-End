@@ -34,6 +34,7 @@ import Dlistpage from './Components/Dlistpage';
 import Userpendinglist from './Components/Userpendinglist';
 import Usercompletedlist from './Components/Usercompletedlist';
 import Checkapplication from './Components/Checkapplication';
+import Invoice from './Components/Invoice';
 
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/Registration" element={<Registration />} />
+        <Route path="/Invoice/:documentId" element={<Invoice />} />
         <Route path="/" element={<Login />} />
         <Route path="/Admindashboard" element={<Admindashboard />} />
         <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />

@@ -267,7 +267,6 @@ const Ddashinner = () => {
 
 
 
-            {/* Categories & Subcategories Grid */}
             <h4 className="mt-8 text-xl font-semibold text-gray-700 ml-5">Application For Categories and Subcategories</h4>
       <div className="grid grid-cols-3 gap-4 w-full max-w-7xl mx-auto mt-4">
         {!selectedCategory ? (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LabelList } from "recharts";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -34,10 +34,12 @@ const CustomerDashboard = () => {
 
     axios.get(`http://localhost:3000/userdashboard/category-counts/${userId}`)
       .then(res => {
-        setCategoryData(res.data.map(item => ({
+        const dataWithColors = res.data.map((item, index) => ({
           name: item.category,
-          value: item.totalApplications
-        })));
+          value: item.totalApplications,
+          color: generateColor(index), // Assign dynamic color
+        }));
+        setCategoryData(dataWithColors);
       })
       .catch(err => console.error("Error fetching category data:", err));
 
@@ -52,10 +54,14 @@ const CustomerDashboard = () => {
       .catch(err => console.error("Error fetching status counts:", err));
   }, [userId]);
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A020F0"];
+  // Function to generate dynamic colors
+  const generateColor = (index) => {
+    const hue = (index * 137.508) % 360; // Distribute colors around the hue circle
+    return `hsl(${hue}, 70%, 50%)`;
+  };
 
   return (
-    <div className="ml-72 mt-14 p-6">
+    <div className="ml-80 mt-14 p-6">
       {/* Top Cards */}
       <motion.div 
         className="grid grid-cols-4 gap-6 mb-8"
@@ -64,14 +70,14 @@ const CustomerDashboard = () => {
         transition={{ duration: 0.8 }}
       >
         {[
-          { icon: <FaClipboardList size={40} />, count: appliedCount, label: "Total Applied", color: "bg-blue-500", onClick: () => navigate('/customerapply') },
-          { icon: <FaCheckCircle size={40} />, count: completedCount, label: "Total Completed", color: "bg-green-500", onClick: () => navigate('/Usercompletedlist') },
-          { icon: <FaRupeeSign size={40} />, count: `₹${appliedCount * 150}`, label: "Total Transaction", color: "bg-purple-500" },
-          { icon: <FaClock size={40} />, count: Math.max(appliedCount - completedCount, 0), label: "Pending Applications", color: "bg-yellow-500", onClick: () => navigate('/Userpendinglist') }
+          { icon: <FaClipboardList size={40} />, count: appliedCount, label: "Total Applied", color: "bg-blue-300", onClick: () => navigate('/customerapply') },
+          { icon: <FaCheckCircle size={40} />, count: completedCount, label: "Total Completed", color: "bg-green-300", onClick: () => navigate('/Usercompletedlist') },
+          { icon: <FaRupeeSign size={40} />, count: `₹${appliedCount * 150}`, label: "Total Transaction", color: "bg-purple-300" },
+          { icon: <FaClock size={40} />, count: Math.max(appliedCount - completedCount, 0), label: "Pending Applications", color: "bg-yellow-300", onClick: () => navigate('/Userpendinglist') }
         ].map((item, index) => (
           <div 
             key={index} 
-            className={`${item.color} text-white p-6 rounded-xl shadow-lg text-center hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2`} 
+            className={`${item.color} text-gray-800 p-6 rounded-xl shadow-md text-center hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-2`} 
             onClick={item.onClick}
           > 
             {item.icon}
@@ -84,44 +90,42 @@ const CustomerDashboard = () => {
       {/* Charts Section */}
       <div className="flex gap-6">
         {/* Bar Chart Container */}
-        <div className="w-1/2 bg-white shadow-xl border rounded-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Application Status Overview</h2>
+        <div className="w-1/2 bg-white shadow-md border rounded-xl p-6">
+          <h2 className="text-xl font-bold mb-4">Application Status Overview</h2>
           <ResponsiveContainer width="100%" height={400}>
             <BarChart data={statusData} margin={{ top: 20, right: 30, left: 20, bottom: 10 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="status" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="count" fill="#8884d8" barSize={35} /> {/* Reduced bar size */}
+              <Bar dataKey="count" fill="#EA580C" barSize={40}>
+                <LabelList dataKey="count" position="top" />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
 
         {/* Pie Chart Container */}
-        <div className="w-1/2 bg-white shadow-xl border rounded-xl p-6 flex items-center justify-center">
-          <h2 className="absolute text-xl font-semibold -mt-60">Category Distribution</h2>
+        <div className="w-1/2 bg-white shadow-md border rounded-xl p-6 flex flex-col items-center justify-center relative">
+          <h2 className="text-xl text-black mb-4 font-bold">Category Distribution</h2>
+
           {categoryData.length > 0 ? (
-            <PieChart width={400} height={400}>
+            <PieChart width={430} height={400}>
               <Pie
                 data={categoryData}
                 cx="50%"
                 cy="50%"
-                outerRadius={130}
-                fill="#8884d8"
+                outerRadius={150}
                 dataKey="value"
                 nameKey="name"
-                label={({ x, y, name }) => (
-                  <text x={x} y={y - 10} textAnchor="middle" className="text-sm font-semibold fill-gray-700">
-                    {name}
-                  </text>
-                )}
+                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
               >
                 {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend verticalAlign="bottom" height={36} />
             </PieChart>
           ) : (
             <p className="text-lg font-semibold text-gray-500 text-center">No data available</p>

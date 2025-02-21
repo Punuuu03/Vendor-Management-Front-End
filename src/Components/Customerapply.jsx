@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt } from "react-icons/fa"; // Import document icon
-import jwtDecode from "jwt-decode"; // Import jwt-decode
+import { FaFileAlt } from "react-icons/fa";
+import jwtDecode from "jwt-decode";
 
 const VerifyDocuments = () => {
   const [documents, setDocuments] = useState([]);
   const [certificates, setCertificates] = useState([]);
   const [userId, setUserId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
-    // Get the token from localStorage or sessionStorage
-    const token = localStorage.getItem("token"); // Adjust storage as per your setup
-
+    const token = localStorage.getItem("token");
     if (token) {
       try {
         const decodedToken = jwtDecode(token);
-        setUserId(decodedToken.user_id); // Assuming user_id is in the token
+        setUserId(decodedToken.user_id);
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -28,7 +28,9 @@ const VerifyDocuments = () => {
         .get(`http://localhost:3000/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
-          const filteredDocs = allDocuments.filter((doc) => doc.user_id === userId);
+          const filteredDocs = allDocuments
+            .filter((doc) => doc.user_id === userId)
+            .reverse(); // Show newest first
           setDocuments(filteredDocs);
         })
         .catch((error) => console.error("Error fetching documents:", error));
@@ -41,7 +43,9 @@ const VerifyDocuments = () => {
   }, [userId]);
 
   const getCertificateByDocumentId = (documentId) => {
-    const matchedCertificate = certificates.find((cert) => cert.document_id === documentId);
+    const matchedCertificate = certificates.find(
+      (cert) => cert.document_id === documentId
+    );
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
 
@@ -53,7 +57,9 @@ const VerifyDocuments = () => {
     }
 
     try {
-      const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
+      const response = await axios.get(
+        `http://localhost:3000/certificates/${certificateId}`
+      );
 
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
@@ -66,23 +72,56 @@ const VerifyDocuments = () => {
     }
   };
 
+  // Search and Filter Logic
+  const filteredDocuments = documents.filter((doc) => {
+    const searchString = `${doc.user_id} ${doc.document_id} ${doc.category_name} ${doc.subcategory_name} ${doc.name} ${doc.email} ${doc.phone} ${doc.address}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+
+    const statusMatch = statusFilter
+      ? doc.status.toLowerCase() === statusFilter.toLowerCase()
+      : true;
+
+    return searchString && statusMatch;
+  });
+
   return (
     <div className="flex h-screen">
-      {/* Sidebar Component */}
-      <div className="w-[250px] flex-shrink-0">  {/* Sidebar should not shrink */}
-        {/* <Sidebar /> */}
-      </div>
+      {/* Sidebar */}
+      <div className="w-[310px] flex-shrink-0">{/* <Sidebar /> */}</div>
 
       {/* Main Content */}
-      <div className="flex-1 bg-gray-100 p-6 overflow-hidden overflow-x-auto">
+      <div className="flex-1 bg-gray-100 p-6 mt-5 overflow-hidden">
         <div className="w-full bg-white p-6">
-          <div className="flex justify-center items-center mb-4">
+          {/* Header with Search and Filter */}
+          <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold">Applications</h1>
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1"
+              />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="border border-gray-300 rounded px-3 py-1"
+              >
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
+                <option value="Uploaded">Uploaded</option>
+              </select>
+            </div>
           </div>
 
-          {/* Scrollable Table Container */}
-          <div className="w-full ">
-            <table className="w-full min-w-[1200px] border-collapse border border-gray-300">
+          {/* Table Container with Scroll */}
+          <div className="w-full max-h-[75vh] overflow-y-auto border border-gray-300">
+            <table className="w-full min-w-[1200px] border-collapse">
               <thead className="bg-gray-300">
                 <tr>
                   <th className="border p-3">S.No</th>
@@ -101,7 +140,7 @@ const VerifyDocuments = () => {
                 </tr>
               </thead>
               <tbody>
-                {documents.map((doc, index) => (
+                {filteredDocuments.map((doc, index) => (
                   <tr key={doc.document_id} className="border-t hover:bg-gray-100">
                     <td className="border p-2 text-center">{index + 1}</td>
                     <td className="border p-2 text-center">{doc.user_id}</td>
@@ -119,43 +158,43 @@ const VerifyDocuments = () => {
                         </div>
                       ))}
                     </td>
-                  <td className="border p-2">
-  <div className="flex justify-center">
-    {doc.documents &&
-      doc.documents.map((file, index) => (
-        <a
-          key={index}
-          href={file.file_path}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500 hover:underline"
-          onClick={(e) => {
-            e.preventDefault();
-            window.open(file.file_path, "_blank", "width=800,height=600");
-          }}
-        >
-          <FaFileAlt className="text-blue-500 text-xl" />
-        </a>
-      ))}
-  </div>
-</td>
-
-                    <td className="border p-2 ">
+                    <td className="border p-2">
+                      <div className="flex justify-center">
+                        {doc.documents &&
+                          doc.documents.map((file, idx) => (
+                            <a
+                              key={idx}
+                              href={file.file_path}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                window.open(file.file_path, "_blank", "width=800,height=600");
+                              }}
+                            >
+                              <FaFileAlt className="text-blue-500 text-xl" />
+                            </a>
+                          ))}
+                      </div>
+                    </td>
+                    <td className="border p-2">
                       <span
-                        className={`px-3 py-1 rounded-full text-white text-sm flex justify-center ${doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
+                        className={`px-3 py-1 rounded-full text-white text-sm flex justify-center ${
+                          doc.status === "Approved"
+                            ? "bg-green-500"
+                            : doc.status === "Rejected"
                             ? "bg-red-500"
                             : doc.status === "Completed"
-                              ? "bg-blue-500"
-                              : "bg-yellow-500"
-                          }`}
+                            ? "bg-blue-500"
+                            : "bg-yellow-500"
+                        }`}
                       >
                         {doc.status}
                       </span>
                     </td>
                     <td className="p-3 flex justify-center">
-                      {doc.status === "Completed" && getCertificateByDocumentId(doc.document_id) ? (
+                      {doc.status === "Completed" &&
+                      getCertificateByDocumentId(doc.document_id) ? (
                         <button
                           onClick={() => handleViewCertificate(doc.document_id)}
                           className="bg-blue-500 text-white px-3 py-1 rounded"
@@ -168,9 +207,16 @@ const VerifyDocuments = () => {
                     </td>
                   </tr>
                 ))}
+                {filteredDocuments.length === 0 && (
+                  <tr>
+                    <td colSpan="13" className="text-center py-4">
+                      No documents found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
-          </div> {/* End of Scrollable Table Container */}
+          </div>
         </div>
       </div>
     </div>

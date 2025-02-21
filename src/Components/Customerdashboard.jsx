@@ -18,6 +18,7 @@ import {
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css"; // Import calendar styles
 import logo from "../assets/logo.png";
+import jwtDecode from "jwt-decode";
 
 
 const Sidebar = ({ onNavigate }) => {
@@ -98,7 +99,7 @@ const Customerdashboard = ({ children }) => {
       <Sidebar onNavigate={(path) => navigate(path)} />
       <div className="flex-1 p-6">
         {/* Top Section (Navbar) */}
-        <div className="flex items-center justify-between bg-[#00234E] text-white p-4 rounded-md shadow-md ml-[310px] fixed top-0 left-0 w-[80%] z-10">
+        <div className="flex items-center justify-between bg-[#00234E] text-white p-4 rounded-md shadow-md ml-[330px] fixed top-0 left-0 w-[80%] z-10">
           <span className="text-lg font-bold">Customer Dashboard</span>
 
           {/* Profile Section */}
@@ -113,7 +114,7 @@ const Customerdashboard = ({ children }) => {
               <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-10">
                 <div className="p-4 border-b text-center">
                   {userEmail ? (
-                    <p className="text-lg bg-blue-600 text-white p-2 rounded-md">
+                    <p className="text-lg bg-orange-600 text-white p-2 rounded-md">
                       <strong>{userEmail}</strong>
                     </p>
                   ) : (
@@ -122,7 +123,7 @@ const Customerdashboard = ({ children }) => {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-32 px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 block mx-auto mb-2"
+                  className="w-32 text-3 font-bold px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 block mx-auto mb-2"
                 >
                   Logout
                 </button>
