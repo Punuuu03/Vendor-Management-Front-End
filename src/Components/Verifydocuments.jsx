@@ -13,7 +13,7 @@ const VerifyDocuments = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/documents/list")
+      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -23,12 +23,12 @@ const VerifyDocuments = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-      .get("http://localhost:3000/users/distributors")
+      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-      .get("http://localhost:3000/certificates")
+      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
   }, []);
@@ -59,7 +59,7 @@ const VerifyDocuments = () => {
 
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`http://localhost:3000/documents/update-status/${documentId}`, {
+      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
         status: newStatus,
       });
       setDocuments((prev) =>
@@ -76,7 +76,7 @@ const VerifyDocuments = () => {
   const handleAssignDistributor = async (documentId, distributorId) => {
     if (!distributorId) return;
     try {
-      await axios.put(`http://localhost:3000/documents/assign-distributor/${documentId}`, {
+      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/assign-distributor/${documentId}`, {
         distributor_id: distributorId,
       });
       setDocuments((prev) =>
@@ -116,7 +116,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {

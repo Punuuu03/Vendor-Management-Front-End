@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaSave } from "react-icons/fa";
 
 const RequiredDocuments = () => {
   const [documents, setDocuments] = useState([]);
@@ -14,10 +14,7 @@ const RequiredDocuments = () => {
     document_names: "",
   });
   const [editId, setEditId] = useState(null);
-
-  const apiUrl = "http://localhost:3000/required-documents";
-  const categoriesUrl = "http://localhost:3000/categories";
-  const subcategoriesUrl = "http://localhost:3000/subcategories/category/";
+  const [editedName, setEditedName] = useState(""); // New state for inline editing
 
   // Fetch required documents and categories
   useEffect(() => {
@@ -27,7 +24,7 @@ const RequiredDocuments = () => {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get(apiUrl);
+      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents");
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -36,7 +33,7 @@ const RequiredDocuments = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(categoriesUrl);
+      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -46,11 +43,11 @@ const RequiredDocuments = () => {
   const fetchSubcategories = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`${subcategoriesUrl}${categoryId}`);
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories/category/${categoryId}`);
       setSubcategories(response.data);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
-      setSubcategories([]); // Clear the list on error
+      setSubcategories([]);
     }
   };
 
@@ -62,7 +59,7 @@ const RequiredDocuments = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${apiUrl}/${id}`);
+      await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents/${id}`);
       Swal.fire("Deleted!", "Document deleted successfully", "success");
       fetchDocuments();
     } catch (error) {
@@ -72,25 +69,27 @@ const RequiredDocuments = () => {
 
   const handleEdit = (doc) => {
     setEditId(doc.id);
-    setFormData({
-      category_id: doc.category.category_id,
-      subcategory_id: doc.subcategory.subcategory_id,
-      document_names: doc.document_names,
-    });
-    fetchSubcategories(doc.category.category_id);
-    setModalOpen(true);
+    setEditedName(doc.document_names); // Set current document name for editing
+  };
+
+  const handleSave = async (id) => {
+    try {
+      await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents/${id}`, {
+        document_names: editedName,
+      });
+      Swal.fire("Updated!", "Document name updated successfully", "success");
+      setEditId(null);
+      fetchDocuments();
+    } catch (error) {
+      Swal.fire("Error!", "Failed to update document name", "error");
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editId) {
-        await axios.put(`${apiUrl}/${editId}`, formData);
-        Swal.fire("Updated!", "Document updated successfully", "success");
-      } else {
-        await axios.post(apiUrl, formData);
-        Swal.fire("Added!", "Document added successfully", "success");
-      }
+      await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents", formData);
+      Swal.fire("Added!", "Document added successfully", "success");
       fetchDocuments();
       setModalOpen(false);
       setFormData({ category_id: "", subcategory_id: "", document_names: "" });
@@ -119,10 +118,9 @@ const RequiredDocuments = () => {
             <table className="w-full border-collapse">
               <thead className="bg-gray-300 text-black">
                 <tr>
-                  <th className="p-3 text-left border-r border-gray-400">ID</th>
+                  <th className="p-3 text-left border-r border-gray-400">Document Names</th>
                   <th className="p-3 text-left border-r border-gray-400">Category</th>
                   <th className="p-3 text-left border-r border-gray-400">Subcategory</th>
-                  <th className="p-3 text-left border-r border-gray-400">Document Names</th>
                   <th className="p-3 text-center">Actions</th>
                 </tr>
               </thead>
@@ -130,17 +128,36 @@ const RequiredDocuments = () => {
                 {documents.length > 0 ? (
                   documents.map((doc, index) => (
                     <tr key={doc.id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-                      <td className="p-3 border-r border-gray-400">{doc.id}</td>
+                      <td className="p-3 border-r border-gray-400">
+                        {editId === doc.id ? (
+                          <input
+                            type="text"
+                            value={editedName}
+                            onChange={(e) => setEditedName(e.target.value)}
+                            className="border p-1 rounded w-full"
+                          />
+                        ) : (
+                          doc.document_names
+                        )}
+                      </td>
                       <td className="p-3 border-r border-gray-400">{doc.category.category_name}</td>
                       <td className="p-3 border-r border-gray-400">{doc.subcategory.subcategory_name}</td>
-                      <td className="p-3 border-r border-gray-400">{doc.document_names}</td>
                       <td className="p-3 text-center">
-                        <button
-                          onClick={() => handleEdit(doc)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                        >
-                          <FaEdit />
-                        </button>
+                        {editId === doc.id ? (
+                          <button
+                            onClick={() => handleSave(doc.id)}
+                            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                          >
+                            <FaSave />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleEdit(doc)}
+                            className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                          >
+                            <FaEdit />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleDelete(doc.id)}
                           className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
@@ -152,7 +169,7 @@ const RequiredDocuments = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="5" className="p-3 text-center text-gray-500">
+                    <td colSpan="4" className="p-3 text-center text-gray-500">
                       No documents found
                     </td>
                   </tr>
@@ -220,7 +237,6 @@ const RequiredDocuments = () => {
         </div>
       )}
     </div>
-
   );
 };
 

@@ -24,15 +24,15 @@ const CustomerDashboard = () => {
   useEffect(() => {
     if (!userId) return;
 
-    axios.get(`http://localhost:3000/userdashboard/total-applied/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/total-applied/${userId}`)
       .then(res => setAppliedCount(res.data.totalCount))
       .catch(err => console.error("Error fetching total applied:", err));
 
-    axios.get(`http://localhost:3000/userdashboard/total-completed/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/total-completed/${userId}`)
       .then(res => setCompletedCount(res.data.totalCompleted))
       .catch(err => console.error("Error fetching total completed:", err));
 
-    axios.get(`http://localhost:3000/userdashboard/category-counts/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/category-counts/${userId}`)
       .then(res => {
         const dataWithColors = res.data.map((item, index) => ({
           name: item.category,
@@ -43,7 +43,7 @@ const CustomerDashboard = () => {
       })
       .catch(err => console.error("Error fetching category data:", err));
 
-    axios.get(`http://localhost:3000/userdashboard/status-count/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/status-count/${userId}`)
       .then(res => {
         const formattedData = res.data.map(item => ({
           status: item.status,

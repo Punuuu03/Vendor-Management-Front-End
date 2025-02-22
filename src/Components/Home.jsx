@@ -49,7 +49,7 @@ const ProcessCards = () => {
   }, [totalSlides]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/document-types")
+    fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/document-types")
       .then((res) => res.json())
       .then((data) => setServices(data))
       .catch((error) => console.error("Error fetching data:", error));

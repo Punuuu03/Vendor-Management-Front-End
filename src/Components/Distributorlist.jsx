@@ -10,7 +10,7 @@ const DistributorList = () => {
     const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
     const navigate = useNavigate(); // For navigation
 
-    const apiUrl = "http://localhost:3000/users/distributors";
+    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors";
 
     useEffect(() => {
         fetchDistributors();
@@ -34,7 +34,7 @@ const DistributorList = () => {
         try {
             // Send password update to the backend API
             if (updatedPassword) {
-                await axios.patch(`http://localhost:3000/users/password/${id}`, { newPassword: updatedPassword });
+                await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/password/${id}`, { newPassword: updatedPassword });
             }
 
             setDistributors(
