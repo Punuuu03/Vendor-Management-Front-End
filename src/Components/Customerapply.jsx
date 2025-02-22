@@ -25,7 +25,7 @@ const VerifyDocuments = () => {
   useEffect(() => {
     if (userId) {
       axios
-        .get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list`)
+        .get(`http://localhost:3000/documents/list`)
         .then((response) => {
           const allDocuments = response.data.documents;
           const filteredDocs = allDocuments
@@ -36,7 +36,7 @@ const VerifyDocuments = () => {
         .catch((error) => console.error("Error fetching documents:", error));
 
       axios
-        .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
+        .get("http://localhost:3000/certificates")
         .then((response) => setCertificates(response.data))
         .catch((error) => console.error("Error fetching certificates:", error));
     }
@@ -58,7 +58,7 @@ const VerifyDocuments = () => {
 
     try {
       const response = await axios.get(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`
+        `http://localhost:3000/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {

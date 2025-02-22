@@ -22,7 +22,7 @@ import Category from './Components/Category';
 import './App.css'
 import Verifydocuments from './Components/Verifydocuments';
 import DistributorList from "./Components/Distributorlist";
-import Distributoregister from "./Components/Distributoregister";
+import Distributorregister from "./Components/Distributorregister";
 import Distributorverify from './Components/Distributorverify';
 import Customerapply from './Components/Customerapply';
 // import Custsidebar from "./Components/Customerdashboard";
@@ -57,7 +57,7 @@ function App() {
         <Route path="/Addfieldname" element={<Admindashboard><Addfieldname /></Admindashboard>} />
         <Route path="/Verifydocuments" element={<Admindashboard><Verifydocuments /></Admindashboard>} />
         <Route path="/distributorlist" element={<Admindashboard><DistributorList /></Admindashboard>} />
-        <Route path="/Distributoregister" element={<Admindashboard><Distributoregister /></Admindashboard>} />
+        <Route path="/Distributorregister" element={<Admindashboard><Distributorregister /></Admindashboard>} />
         <Route path="/Recentapplications" element={<Admindashboard><Recentapplications /></Admindashboard>} />
 
         <Route path="/Customerdashboard" element={<Customerdashboard />} />

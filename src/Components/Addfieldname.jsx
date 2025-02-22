@@ -24,7 +24,7 @@ const FieldNames = () => {
 
   const fetchFields = async () => {
     try {
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names");
+      const response = await axios.get("http://localhost:3000/field-names");
       setFields(response.data);
     } catch (error) {
       console.error("Error fetching field names:", error);
@@ -33,7 +33,7 @@ const FieldNames = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories");
+      const response = await axios.get("http://localhost:3000/categories");
       setCategories(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -43,7 +43,7 @@ const FieldNames = () => {
   const fetchSubcategories = async (categoryId) => {
     if (!categoryId) return;
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories/category/${categoryId}`);
+      const response = await axios.get(`http://localhost:3000/subcategories/category/${categoryId}`);
       setSubcategories(response.data);
     } catch (error) {
       console.error("Error fetching subcategories:", error);
@@ -59,7 +59,7 @@ const FieldNames = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${id}`);
+      await axios.delete(`http://localhost:3000/field-names/${id}`);
       Swal.fire("Deleted!", "Field Name deleted successfully", "success");
       fetchFields();
     } catch (error) {
@@ -82,10 +82,10 @@ const FieldNames = () => {
     e.preventDefault();
     try {
       if (editId) {
-        await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${editId}`, formData);
+        await axios.put(`http://localhost:3000/field-names/${editId}`, formData);
         Swal.fire("Updated!", "Field Name updated successfully", "success");
       } else {
-        await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names", formData);
+        await axios.post("http://localhost:3000/field-names", formData);
         Swal.fire("Added!", "Field Name added successfully", "success");
       }
       fetchFields();
@@ -221,7 +221,7 @@ export default FieldNames;
 
 //   const fetchCategories = async () => {
 //     try {
-//       const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories");
+//       const response = await axios.get("http://localhost:3000/categories");
 //       setCategories(response.data);
 //     } catch (error) {
 //       console.error("Error fetching categories:", error);
@@ -238,7 +238,7 @@ export default FieldNames;
 //     }
 
 //     try {
-//       const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories/${selectedCategory}`);
+//       const response = await axios.get(`http://localhost:3000/subcategories/${selectedCategory}`);
 
 //       if (Array.isArray(response.data)) {
 //         setSubcategories(response.data);
@@ -271,7 +271,7 @@ export default FieldNames;
 //     }
 
 //     try {
-//       const response = await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names", {
+//       const response = await axios.post("http://localhost:3000/field-names", {
 //         category_id: formData.category_id,
 //         subcategory_id: formData.subcategory_id,
 //         document_fields: formData.document_fields.trim(),

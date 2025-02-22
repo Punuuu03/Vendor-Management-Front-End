@@ -11,7 +11,7 @@ const Subcategories = () => {
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
-  const API_BASE_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com";
+  const API_BASE_URL = "http://localhost:3000";
 
   useEffect(() => {
     fetchSubcategories();
@@ -99,7 +99,7 @@ const Subcategories = () => {
   return (
     <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       <div className="w-full p-6">
-        <div className="flex justify-end -mt-10">
+        <div className="flex justify-end">
 
         </div>
       </div>

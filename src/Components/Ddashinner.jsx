@@ -22,9 +22,9 @@ const Ddashinner = () => {
   const navigate = useNavigate();
 
 
-  const API_BASE_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
-  const SUBCATEGORIES_API_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories";
-  const API_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/statistics/cscounts";
+  const API_BASE_URL = "http://localhost:3000/categories";
+  const SUBCATEGORIES_API_URL = "http://localhost:3000/subcategories";
+  const API_URL = "http://localhost:3000/statistics/cscounts";
 
 
   const defaultValues = {
@@ -40,7 +40,7 @@ const Ddashinner = () => {
 
 
   useEffect(() => {
-      fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/statistics/counts")
+      fetch("http://localhost:3000/statistics/counts")
         .then((res) => res.json())
         .then((result) => setData(result))
         .catch((err) => console.error("Error fetching data:", err));
@@ -130,7 +130,7 @@ const Ddashinner = () => {
     if (distributorId) {
       setLoading(true);
       setError(null);
-      fetch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/statistics/distributor-counts/${distributorId}`)
+      fetch(`http://localhost:3000/statistics/distributor-counts/${distributorId}`)
         .then((res) => {
           if (!res.ok) {
             throw new Error('Failed to fetch distributor data');

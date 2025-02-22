@@ -15,9 +15,9 @@ const RequiredDocuments = () => {
   });
   const [editId, setEditId] = useState(null);
 
-  const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents";
-  const categoriesUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
-  const subcategoriesUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories/category/";
+  const apiUrl = "http://localhost:3000/required-documents";
+  const categoriesUrl = "http://localhost:3000/categories";
+  const subcategoriesUrl = "http://localhost:3000/subcategories/category/";
 
   // Fetch required documents and categories
   useEffect(() => {

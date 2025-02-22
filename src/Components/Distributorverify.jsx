@@ -33,7 +33,7 @@ const VerifyDocuments = () => {
   // Fetch documents by distributor ID
   const fetchDocuments = async (distributorId) => {
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list/${distributorId}`);
+      const response = await axios.get(`http://localhost:3000/documents/list/${distributorId}`);
       setDocuments(response.data.documents);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -43,7 +43,7 @@ const VerifyDocuments = () => {
   // Update document status
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, { status: newStatus });
+      await axios.put(`http://localhost:3000/documents/update-status/${documentId}`, { status: newStatus });
       setDocuments((prev) =>
         prev.map((doc) => (doc.document_id === documentId ? { ...doc, status: newStatus } : doc))
       );
@@ -82,7 +82,7 @@ const VerifyDocuments = () => {
     formData.append("distributor_id", distributorId.toString());
 
     try {
-      await axios.post("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/upload", formData, {
+      await axios.post("http://localhost:3000/certificates/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
