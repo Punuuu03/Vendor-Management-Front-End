@@ -35,6 +35,7 @@ import Userpendinglist from './Components/Userpendinglist';
 import Usercompletedlist from './Components/Usercompletedlist';
 import Checkapplication from './Components/Checkapplication';
 import Invoice from './Components/Invoice';
+import View from './Components/View';
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
         <Route path="/Registration" element={<Registration />} />
         <Route path="/Invoice/:documentId" element={<Invoice />} />
         <Route path="/" element={<Login />} />
+        <Route path="/View/:documentId" element={<View />} />
         <Route path="/Admindashboard" element={<Admindashboard />} />
         <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />
         <Route path="/ElistPage" element={<Admindashboard><ElistPage /></Admindashboard>} />

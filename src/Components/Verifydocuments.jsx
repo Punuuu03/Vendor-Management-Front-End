@@ -13,7 +13,7 @@ const VerifyDocuments = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:3000/documents/list")
+      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -23,12 +23,12 @@ const VerifyDocuments = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-      .get("http://localhost:3000/users/distributors")
+      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
     axios
-      .get("http://localhost:3000/certificates")
+      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
   }, []);
@@ -59,7 +59,7 @@ const VerifyDocuments = () => {
 
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`http://localhost:3000/documents/update-status/${documentId}`, {
+      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
         status: newStatus,
       });
       setDocuments((prev) =>
@@ -76,7 +76,7 @@ const VerifyDocuments = () => {
   const handleAssignDistributor = async (documentId, distributorId) => {
     if (!distributorId) return;
     try {
-      await axios.put(`http://localhost:3000/documents/assign-distributor/${documentId}`, {
+      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/assign-distributor/${documentId}`, {
         distributor_id: distributorId,
       });
       setDocuments((prev) =>
@@ -96,6 +96,11 @@ const VerifyDocuments = () => {
     navigate(`/Invoice/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
+
+  const handleView = (documentId, categoryId, subcategoryId) => {
+    navigate(`/View/${documentId}`, { state: { categoryId, subcategoryId } });
+  };
+
   
   const getCertificateByDocumentId = (documentId) => {
     const matchedCertificate = certificates.find(
@@ -111,7 +116,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
+      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -172,13 +177,14 @@ const VerifyDocuments = () => {
                 <th className="border p-2 text-sm font-semibold">Email</th>
                 <th className="border p-2 text-sm font-semibold">Phone</th>
                 <th className="border p-2 text-sm font-semibold">Address</th>
-                <th className="border p-2 text-sm font-semibold">Documents</th>
-                <th className="border p-2 text-sm font-semibold">Documents Fields</th>
+            
                 <th className="border p-2 text-sm font-semibold">Verification</th>
-                <th className="border p-2 text-sm font-semibold">Actions</th>
-                <th className="border p-2 text-sm font-semibold">Assign Distributor</th>
+                <th className="border p-2 text-sm font-semibold">Completed</th>
+                <th className="border p-2 text-sm font-semibold">Action</th>
+                <th className="border p-2 text-sm font-semibold">View</th>
+                
                 <th className="border p-2 text-sm font-semibold">Certificate</th>
-                <th className="border p-2 text-sm font-semibold">Invoice</th>
+                
               </tr>
             </thead>
             <tbody>
@@ -193,16 +199,6 @@ const VerifyDocuments = () => {
                   <td className="border p-2 text-sm">{doc.phone}</td>
                   <td className="border p-2 text-sm">{doc.address}</td>
 
-                  <td className="border p-2">
-                    <div className="flex justify-center">
-                      {doc.documents?.map((file, index) => (
-                        <a key={index} href={file.file_path} target="_blank" rel="noopener noreferrer">
-                          <FaRegFileAlt className="text-blue-500 text-lg" />
-                        </a>
-                      ))}
-                    </div>
-                  </td>
-                  <td>{JSON.stringify(doc.document_fields)}</td>
 
                   <td className="border p-2 text-sm">
                     <span
@@ -217,18 +213,7 @@ const VerifyDocuments = () => {
                     </span>
                   </td>
                   <td className="p-3 flex justify-center space-x-2 text-sm">
-                    <button
-                      onClick={() => handleUpdateStatus(doc.document_id, "Approved")}
-                      className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
-                    >
-                      <FaCheck className="text-white" />
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(doc.document_id, "Rejected")}
-                      className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition"
-                    >
-                      <FaTimes className="text-white" />
-                    </button>
+                    
                     <button
                       onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
                       className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
@@ -237,20 +222,26 @@ const VerifyDocuments = () => {
                     </button>
                   </td>
 
-                  <td className="border p-2 text-sm">
-                    <select
-                      onChange={(e) => handleAssignDistributor(doc.document_id, e.target.value)}
-                      value={doc.distributor_id || ""}
-                      className="p-2 border rounded w-full hover:border-blue-500 transition text-sm"
+
+
+<td className="border p-2 text-center">
+                    <button
+                      onClick={() => handleViewInvoice(doc.document_id)}
+                      className="bg-indigo-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-indigo-600 transition"
                     >
-                      <option value="">Select</option>
-                      {distributors.map((dist) => (
-                        <option key={dist.user_id} value={dist.user_id}>
-                          {dist.name}
-                        </option>
-                      ))}
-                    </select>
+                      <FaFileInvoice className="mr-1" /> Verify
+                    </button>
                   </td>
+
+                  <td className="border p-2 text-center">
+                    <button
+                      onClick={() => handleView(doc.document_id)}
+                      className="bg-indigo-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-indigo-600 transition"
+                    >
+                      <FaFileInvoice className="mr-1" /> View
+                    </button>
+                  </td>
+
                   <td className="border p-2 text-sm">
                     {getCertificateByDocumentId(doc.document_id) ? (
                       <button
@@ -268,16 +259,7 @@ const VerifyDocuments = () => {
                   </td>
 
 
-                  {/* New Invoice Button Column */}
-                  <td className="border p-2 text-center">
-                    <button
-                      onClick={() => handleViewInvoice(doc.document_id)}
-                      className="bg-indigo-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-indigo-600 transition"
-                    >
-                      <FaFileInvoice className="mr-1" /> Invoice
-                    </button>
-                  </td>
-
+               
                   
                 </tr>
               ))}

@@ -11,7 +11,7 @@ const Subcategories = () => {
   const [updatedName, setUpdatedName] = useState("");
   const [isAdding, setIsAdding] = useState(false);
 
-  const API_BASE_URL = "http://localhost:3000";
+  const API_BASE_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com";
 
   useEffect(() => {
     fetchSubcategories();
@@ -97,7 +97,7 @@ const Subcategories = () => {
   };
 
   return (
-    <div className="ml-[260px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       <div className="w-full p-6">
         <div className="flex justify-end -mt-10">
 
@@ -106,12 +106,15 @@ const Subcategories = () => {
 
 
       <div className="w-full max-w-7xl -mt-2 bg-white p-6 shadow-lg">
-        <button
-          onClick={() => setIsAdding(true)}
-          className="bg-[#00234E] text-white px-5 py-3 text-lg rounded-lg hover:opacity-90 transition duration-200 flex items-center"
-        >
-          <FaPlus className="mr-2" /> Add Subcategory
-        </button>
+      <div className="flex justify-end">
+  <button
+    onClick={() => setIsAdding(true)}
+    className="bg-[#00234E] text-white px-3 py-2 text-lg rounded-lg hover:opacity-90 transition duration-200 flex items-center"
+  >
+    <FaPlus className="mr-2" /> Add Subcategory
+  </button>
+</div>
+
         <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Subcategory List</h2>
 
         <div className="overflow-y-auto max-h-[400px] border border-gray-300"> {/* Set max-height to 100px */}

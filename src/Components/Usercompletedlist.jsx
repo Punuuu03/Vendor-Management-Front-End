@@ -23,7 +23,7 @@ const CompletedApplicationsList = () => {
     const fetchCompletedDocuments = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3000/userdashboard/completed/${userId}`
+          `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/completed/${userId}`
         );
         console.log("Fetched completed documents:", response.data);
 
@@ -38,7 +38,7 @@ const CompletedApplicationsList = () => {
 
     const fetchCertificates = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/certificates");
+        const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
         setCertificates(response.data);
       } catch (error) {
         console.error("Error fetching certificates:", error);
@@ -79,7 +79,7 @@ const CompletedApplicationsList = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:3000/certificates/${certificateId}`
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`
       );
 
       if (response.data && response.data.file_url) {

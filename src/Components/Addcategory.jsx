@@ -10,7 +10,7 @@ const AddCategory = () => {
   const [editingId, setEditingId] = useState(null);
   const [updatedName, setUpdatedName] = useState("");
 
-  const apiUrl = "http://localhost:3000/categories";
+  const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
 
   useEffect(() => {
     fetchCategories();
@@ -96,11 +96,11 @@ const AddCategory = () => {
   };
 
   return (
-    <div className="ml-[260px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       {/* Right Section - Add Category */}
       <div className="w-full p-6">
-        <div className="w-full max-w-7xl bg-white p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Category</h2>
+        <div className="w-full max-w-7xl bg-white p-3 shadow-lg">
+          <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">Category</h2>
 
           <div className="flex items-center border-2 border-gray-300 rounded-lg shadow-md overflow-hidden">
             <FaTag className="text-purple-800 p-3 text-2xl" />
@@ -121,11 +121,11 @@ const AddCategory = () => {
         </div>
 
         {/* Categories Table */}
-        <div className="w-full mt-10 bg-white p-6 shadow-lg">
+        <div className="w-full mt-5 bg-white p-5 shadow-lg">
           <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Category List</h2>
 
           {/* Scrollable Table Wrapper */}
-          <div className="overflow-y-auto max-h-60 border border-gray-300">
+          <div className="overflow-y-auto max-h-70 border border-gray-300">
             <table className="w-full border-collapse">
               <thead className="bg-gray-300 text-black sticky top-0">
                 <tr>

@@ -9,7 +9,7 @@ const ElistPage = () => {
     const [searchQuery, setSearchQuery] = useState(""); // State for search query
     const [statusFilter, setStatusFilter] = useState(""); // State for status filter
 
-    const DOCUMENTS_API_URL = `http://localhost:3000/documents/${categoryId}/${subcategoryId}`;
+    const DOCUMENTS_API_URL = `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/${categoryId}/${subcategoryId}`;
 
     // Fetch documents based on categoryId and subcategoryId
     useEffect(() => {

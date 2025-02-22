@@ -11,7 +11,7 @@ const DistributorList = () => {
     const [updatedName, setUpdatedName] = useState("");
     const navigate = useNavigate(); // For navigation
 
-    const apiUrl = "http://localhost:3000/users/distributors";
+    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors";
 
     useEffect(() => {
         fetchDistributors();
