@@ -240,7 +240,7 @@ const handleDownloadAllDocuments = async () => {
 
       {/* Title and Date/Application ID */}
       <div className="text-center flex-1">
-        <h2 className="text-3xl font-bold text-gray-700">Application Details</h2>
+        <h2 className="text-3xl font-bold text-gray-700">Applicant Details</h2>
       </div>
 
       {/* Date and Application ID */}
@@ -274,15 +274,15 @@ const handleDownloadAllDocuments = async () => {
   <tbody>
     {[
       { label: "Application ID", value: documentData.application_id },
-      { label: "User ID", value: documentData.user_id },
+    //   { label: "User ID", value: documentData.user_id },
       { label: "Category", value: documentData.category_name },
       { label: "Subcategory", value: documentData.subcategory_name },
-      { label: "Name", value: documentData.name },
-      { label: "Email", value: documentData.email },
-      { label: "Phone", value: documentData.phone },
+    //   { label: "Name", value: documentData.name },
+    //   { label: "Email", value: documentData.email },
+    //   { label: "Phone", value: documentData.phone },
       { label: "Status", value: documentData.status },
-      { label: "Address", value: documentData.address },
-      { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
+    //   { label: "Address", value: documentData.address },
+    //   { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
     ].reduce((rows, field, index, array) => {
       if (index % 2 === 0) {
         rows.push(array.slice(index, index + 2));
@@ -352,15 +352,15 @@ const handleDownloadAllDocuments = async () => {
           
         {/* Right Side - Documents */}
         {/* <div className="w-1/2"> */}
-        <div className="w-2/2 mx-auto p-6 bg-white shadow-md rounded-lg">
+        <div className="w-2/3 mx-auto p-6 bg-white shadow-md rounded-lg">
       <div className="mt-0 flex space-x-4 items-center">
         {/* Approve Button */}
-        <button
+        {/* <button
           onClick={() => handleUpdateStatus("Approved")}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 flex items-center"
         >
           <FaCheck className="mr-2" /> Approve
-        </button>
+        </button> */}
 
         {/* Reject Button */}
         <button
@@ -373,14 +373,7 @@ const handleDownloadAllDocuments = async () => {
         </button>
 
         {/* Assign Distributor */}
-        <button
-          onClick={() =>
-            setOpenContainer((prev) => (prev === "distributor" ? null : "distributor"))
-          }
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
-        >
-          <FaUserPlus className="mr-2" /> Distributor
-        </button>
+        
 
         {/* Download Button */}
         <button
@@ -421,59 +414,10 @@ const handleDownloadAllDocuments = async () => {
       )}
       
       
-      {openContainer === "distributor" && (
-  <div className="mt-4 border p-4 rounded bg-white relative max-h-80 overflow-y-auto">
-    {/* Close Icon */}
-    <button
-      onClick={() => setOpenContainer(null)}
-      className="absolute top-2 right-2 text-gray-600 hover:text-red-600"
-    >
-      <FaTimes size={16} />
-    </button>
+      
+    
+ 
 
-    {/* Header with Search */}
-    <div className="flex justify-between items-center mb-4 mr-5">
-      <h3 className="text-lg font-semibold">Select a Distributor</h3>
-      <input
-        type="text"
-        placeholder="Search Distributor..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="border p-2 rounded w-48"
-      />
-    </div>
-
-    {/* Distributor List */}
-    <ul className="space-y-2">
-      {filteredDistributors.map((dist) => (
-        <li
-          key={dist.user_id}
-          className={`flex items-center border-b last:border-b-0 p-2 rounded ${
-            selectedDistributor === dist.user_id ? "bg-blue-200" : ""
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={selectedDistributor === dist.user_id}
-            onChange={() => handleCheckboxChange(dist.user_id)}
-            className="mr-2"
-          />
-          <span className="flex-1">{dist.name}</span>
-
-          {/* Save Button */}
-          {selectedDistributor === dist.user_id && (
-            <button
-              onClick={() => handleSaveClick(dist.user_id)}
-              className="bg-blue-900 text-white px-3 py-1 rounded hover:bg-blue-600"
-            >
-              Assign
-            </button>
-          )}
-        </li>
-      ))}
-    </ul>
-  </div>
-)}
 
   
 
@@ -483,10 +427,10 @@ const handleDownloadAllDocuments = async () => {
       <h2 className="text-2xl font-bold text-gray-700 mb-2 flex items-center">
         📋 Application Details
       </h2>
-      <p className="text-lg text-gray-600">
+      {/* <p className="text-lg text-gray-600">
         <strong>Name:</strong>{" "}
         <span className="font-semibold">{documentData.name}</span>
-      </p>
+      </p> */}
       <p className="text-gray-600 mb-4">
         <strong>Application ID:</strong> {documentData.application_id}
       </p>

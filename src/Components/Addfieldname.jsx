@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-import { FaEdit, FaTrash, FaSave } from "react-icons/fa";
+import { FaPlus,FaEdit, FaTrash, FaSave } from "react-icons/fa";
+
 
 const FieldNames = () => {
   const [fields, setFields] = useState([]);
@@ -59,14 +60,48 @@ const FieldNames = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${id}`);
-      Swal.fire("Deleted!", "Field Name deleted successfully", "success");
-      fetchFields();
-    } catch (error) {
-      Swal.fire("Error!", "Failed to delete Field Name", "error");
+    const confirmDelete = await Swal.fire({
+        title: "Enter Deletion Code",
+        text: "Please enter the code to confirm deletion.",
+        input: "text",
+        inputPlaceholder: "Enter code here...",
+        inputAttributes: { autocapitalize: "off" },
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Delete",
+        showLoaderOnConfirm: true,
+        preConfirm: (inputValue) => {
+            if (inputValue !== "0000") {
+                Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
+                return false;
+            }
+            return true;
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    });
+
+    if (confirmDelete.isConfirmed) {
+        // **Remove the field from UI immediately**
+        setFields((prevFields) =>
+            prevFields.filter((field) => field.id !== id)
+        );
+
+        // **Show success message instantly**
+        Swal.fire("Deleted!", "Field Name deleted successfully", "success");
+
+        // **Perform API call in the background**
+        axios
+            .delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/field-names/${id}`)
+            .then(() => {
+                fetchFields(); // Refresh field list
+            })
+            .catch((error) => {
+                console.error("Error deleting field:", error);
+                Swal.fire("Error!", "Failed to delete Field Name", "error");
+            });
     }
-  };
+};
 
   const handleEdit = (field) => {
     setEditId(field.id);
@@ -100,60 +135,64 @@ const FieldNames = () => {
   };
 
   return (
-    <div className="ml-[260px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6">
-        <div className="w-full max-w-7xl bg-white p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Field Names List</h2>
-          <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded">
-            Add Field Names
-          </button>
-        </div>
+    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+  <div className="w-full p-6">
+    <div className="w-full max-w-8xl bg-white p-6 shadow-lg">
+      {/* Header and Button in the Same Row */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Field Names List</h2>
+        <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-900 transition duration-200">
+          <FaPlus className="mr-2" /> Add Field Names
+        </button>
+      </div>
 
-        {/* Documents Table */}
-        <div className="overflow-x-auto" style={{ maxHeight: "450px", overflowY: "auto" }}>
-          <table className="w-full border-collapse border border-gray-300">
-            <thead className="bg-gray-300 sticky top-0">
-              <tr>
-                <th className="border p-2">ID</th>
-                <th className="border p-2">Field Name</th>
-                <th className="border p-2">Category</th>
-                <th className="border p-2">Subcategory</th>
-                <th className="border p-2">Actions</th>
+      {/* Documents Table Container */}
+      <div className="overflow-x-auto border border-gray-300  shadow-md" style={{ maxHeight: "450px", overflowY: "auto" }}>
+        <table className="w-full border-collapse">
+          <thead className="bg-gray-300 sticky top-0">
+            <tr>
+              {/* <th className="border p-2">ID</th> */}
+              <th className="border p-2">Field Name</th>
+              <th className="border p-2">Category</th>
+              <th className="border p-2">Subcategory</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {fields.map((field, index) => (
+              <tr key={field.id} className={index % 2 === 0 ? "bg-white" : "bg-white"}>
+                {/* <td className="border p-2 text-center">{field.id}</td> */}
+                <td className="border p-2 text-center">
+                  {editId === field.id ? (
+                    <input
+                      type="text"
+                      value={editableField}
+                      onChange={(e) => setEditableField(e.target.value)}
+                      className="border p-1 w-full"
+                    />
+                  ) : (
+                    field.document_fields
+                  )}
+                </td>
+                <td className="border p-2 text-center">{field.category.category_name}</td>
+                <td className="border p-2 text-center">{field.subcategory.subcategory_name}</td>
+                <td className="border p-2 text-center gap-2">
+                  {editId === field.id ? (
+                    <FaSave onClick={() => handleSave(field.id)} className="text-green-500 cursor-pointer" />
+                  ) : (
+                    <FaEdit onClick={() => handleEdit(field)} className="text-yellow-500 cursor-pointer" />
+                  )}
+                  <FaTrash onClick={() => handleDelete(field.id)} className="text-red-500 cursor-pointer" />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {fields.map((field, index) => (
-                <tr key={field.id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-                  <td className="border p-2 text-center">{field.id}</td>
-                  <td className="border p-2 text-center">
-                    {editId === field.id ? (
-                      <input
-                        type="text"
-                        value={editableField}
-                        onChange={(e) => setEditableField(e.target.value)}
-                        className="border p-1 w-full"
-                      />
-                    ) : (
-                      field.document_fields
-                    )}
-                  </td>
-                  <td className="border p-2 text-center">{field.category.category_name}</td>
-                  <td className="border p-2 text-center">{field.subcategory.subcategory_name}</td>
-                  <td className="border p-2 text-center">
-                    {editId === field.id ? (
-                      <FaSave onClick={() => handleSave(field.id)} className="text-green-500 cursor-pointer mr-2" />
-                    ) : (
-                      <FaEdit onClick={() => handleEdit(field)} className="text-yellow-500 cursor-pointer mr-2" />
-                    )}
-                    <FaTrash onClick={() => handleDelete(field.id)} className="text-red-500 cursor-pointer" />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-        {/* Modal for Adding Fields */}
+    {/* Modal for Adding Fields */}
         {modalOpen && (
           <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg w-1/3">
@@ -207,7 +246,7 @@ const FieldNames = () => {
           </div>
         )}
       </div>
-    </div>
+    
   );
 };
 

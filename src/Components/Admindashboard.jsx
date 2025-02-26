@@ -3,15 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import jwtDecode from "jwt-decode";
-
-import {
-  FaPlus,
+import {FaPlus,
   FaList,
   FaUserShield,
   FaFileAlt,
   FaTasks,
-  FaExchangeAlt,
-} from "react-icons/fa";
+  FaExchangeAlt, FaTachometerAlt ,FaExclamationTriangle, FaHistory,  FaBell,  FaFileUpload, FaShapes, FaCheckCircle } from "react-icons/fa";
+
+
 import logo from "../assets/logo.png";
 
 const Sidebar = ({ onNavigate }) => {
@@ -31,31 +30,41 @@ const Sidebar = ({ onNavigate }) => {
           className="[h-10px] w-[200px] mb-2"
         />      </div>
 
-      <nav className="mt-6">
-        <ul>
-          {[
-            { icon: <FaPlus />, label: "Dashboard", path: "/Adashinner" },
-            { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" },
-            { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" },
-            { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" },
-            { icon: <FaTasks />, label: "Required Documents", path: "/requireddocuments" },
-            { icon: <FaTasks />, label: "Add Services", path: "/documenttable" },
-            { icon: <FaTasks />, label: "Field Names", path: "/Addfieldname" },
-            { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" },
-            { icon: <FaFileAlt />, label: "Verify Documents", path: "/Verifydocuments" },
-          ].map((item, index) => (
-            <li
-              key={index}
-              className={`flex items-center p-3 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-4 shadow-md ${activePath === item.path ? "bg-white text-black border-l-4 border-blue-600" : "bg-gray-600 hover:bg-gray-400"
-                }`}
-              onClick={() => handleNavigation(item.path)}
-            >
-              <span className="mr-3 text-lg">{item.icon}</span>
-              {item.label}
-            </li>
-          ))}
-        </ul>
-      </nav>
+
+<div className="mt-6 max-h-[80vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+  <nav>
+    <ul>
+      {[
+        { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Adashinner" }, // Dashboard Icon
+        { icon: <FaPlus />, label: "Add Category", path: "/Addcategory" }, // Plus Icon
+        { icon: <FaList />, label: "Subcategory", path: "/Addsubcategory" }, // List Icon
+        { icon: <FaExclamationTriangle />, label: "Error Request", path: "/Adminrequest" }, // Error Icon
+        { icon: <FaHistory />, label: "Error Request History", path: "/Adminerrorhistory" }, // History Icon
+        { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" }, // Shield User Icon
+        { icon: <FaBell />, label: "Notifications", path: "/Addnotifications" }, // Notification Bell
+        { icon: <FaFileAlt />, label: "Required Documents", path: "/requireddocuments" }, // Document Icon
+        // { icon: <FaFileUpload />, label: "Add Services", path: "/documenttable" }, // Upload File Icon
+        { icon: <FaShapes />, label: "Field Names", path: "/Addfieldname" }, // Shapes Icon (for fields)
+        { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" }, // Exchange Icon
+        { icon: <FaCheckCircle />, label: "Verify Documents", path: "/Verifydocuments" }, // Check Circle (Verification)
+      ].map((item, index) => (
+        <li
+          key={index}
+          className={`flex items-center p-2 rounded-lg cursor-pointer transition duration-300 ease-in-out mb-2 shadow-md ${
+            activePath === item.path
+              ? "bg-white text-black border-l-4 border-blue-600"
+              : "bg-gray-600 hover:bg-gray-400"
+          }`}
+          onClick={() => handleNavigation(item.path)}
+        >
+          <span className="mr-2 text-lg">{item.icon}</span>
+          {item.label}
+        </li>
+      ))}
+    </ul>
+  </nav>
+</div>
+
     </div>
   );
 };

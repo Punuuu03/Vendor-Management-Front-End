@@ -58,14 +58,49 @@ const RequiredDocuments = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents/${id}`);
-      Swal.fire("Deleted!", "Document deleted successfully", "success");
-      fetchDocuments();
-    } catch (error) {
-      Swal.fire("Error!", "Failed to delete document", "error");
+    const confirmDelete = await Swal.fire({
+        title: "Enter Deletion Code",
+        text: "Please enter the code to confirm deletion.",
+        input: "text",
+        inputPlaceholder: "Enter code here...",
+        inputAttributes: { autocapitalize: "off" },
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Delete",
+        showLoaderOnConfirm: true,
+        preConfirm: (inputValue) => {
+            if (inputValue !== "0000") {
+                Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
+                return false;
+            }
+            return true;
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    });
+
+    if (confirmDelete.isConfirmed) {
+        // **Remove the document from UI immediately**
+        setDocuments((prevDocuments) =>
+            prevDocuments.filter((document) => document.id !== id)
+        );
+
+        // **Show success message instantly**
+        Swal.fire("Deleted!", "Document deleted successfully", "success");
+
+        // **Perform API call in the background**
+        axios
+            .delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/required-documents/${id}`)
+            .then(() => {
+                fetchDocuments(); // Refresh document list
+            })
+            .catch((error) => {
+                console.error("Error deleting document:", error);
+                Swal.fire("Error!", "Failed to delete document", "error");
+            });
     }
-  };
+};
+
 
   const handleEdit = (doc) => {
     setEditId(doc.id);
@@ -100,85 +135,84 @@ const RequiredDocuments = () => {
   };
 
   return (
-    <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      {/* Required Documents Section */}
-      <div className="w-full p-6">
-        <div className="w-full max-w-7xl bg-white p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Manage Required Documents</h2>
-
-          {/* Add Document Button */}
-          <div className="flex justify-end mb-4">
-            <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded">
-              <FaPlus className="mr-2" /> Add Document
-            </button>
-          </div>
-
-          {/* Documents Table with Scroll */}
-          <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
-            <table className="w-full border-collapse">
-              <thead className="bg-gray-300 text-black">
-                <tr>
-                  <th className="p-3 text-left border-r border-gray-400">Document Names</th>
-                  <th className="p-3 text-left border-r border-gray-400">Category</th>
-                  <th className="p-3 text-left border-r border-gray-400">Subcategory</th>
-                  <th className="p-3 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {documents.length > 0 ? (
-                  documents.map((doc, index) => (
-                    <tr key={doc.id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
-                      <td className="p-3 border-r border-gray-400">
-                        {editId === doc.id ? (
-                          <input
-                            type="text"
-                            value={editedName}
-                            onChange={(e) => setEditedName(e.target.value)}
-                            className="border p-1 rounded w-full"
-                          />
-                        ) : (
-                          doc.document_names
-                        )}
-                      </td>
-                      <td className="p-3 border-r border-gray-400">{doc.category.category_name}</td>
-                      <td className="p-3 border-r border-gray-400">{doc.subcategory.subcategory_name}</td>
-                      <td className="p-3 text-center">
-                        {editId === doc.id ? (
-                          <button
-                            onClick={() => handleSave(doc.id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                          >
-                            <FaSave />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => handleEdit(doc)}
-                            className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                          >
-                            <FaEdit />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleDelete(doc.id)}
-                          className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                        >
-                          <FaTrash />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="p-3 text-center text-gray-500">
-                      No documents found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+  {/* Required Documents Section */}
+  <div className="w-full">
+    <div className="w-full max-w-7xl bg-white p-6 shadow-lg">
+      {/* Header and Button in Same Row */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-800">Required Documents</h2>
+        <button onClick={() => setModalOpen(true)} className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center hover:opacity-90 transition duration-200">
+          <FaPlus className="mr-2" /> Add Document
+        </button>
       </div>
+
+      {/* Documents Table with Scroll */}
+      <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+        <table className="w-full border-collapse">
+          <thead className="bg-gray-300 text-black">
+            <tr>
+              <th className="p-3 text-left border-r border-gray-400">Document Names</th>
+              <th className="p-3 text-left border-r border-gray-400">Category</th>
+              <th className="p-3 text-left border-r border-gray-400">Subcategory</th>
+              <th className="p-3 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {documents.length > 0 ? (
+              documents.map((doc, index) => (
+                <tr key={doc.id} className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}>
+                  <td className="p-3 border-r border-gray-400">
+                    {editId === doc.id ? (
+                      <input
+                        type="text"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                        className="border p-1 rounded w-full"
+                      />
+                    ) : (
+                      doc.document_names
+                    )}
+                  </td>
+                  <td className="p-3 border-r border-gray-400">{doc.category.category_name}</td>
+                  <td className="p-3 border-r border-gray-400">{doc.subcategory.subcategory_name}</td>
+                  <td className="p-3 text-center">
+                    {editId === doc.id ? (
+                      <button
+                        onClick={() => handleSave(doc.id)}
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                      >
+                        <FaSave />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleEdit(doc)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                      >
+                        <FaEdit />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDelete(doc.id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="p-3 text-center text-gray-500">
+                  No documents found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
       {/* Add / Edit Document Modal */}
       {modalOpen && (

@@ -4,16 +4,21 @@ import { FaRegFileAlt, FaFileInvoice,FaCheck, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom"; 
 
 const VerifyDocuments = () => {
-  const [documents, setDocuments] = useState([]);
+  // const [documents, setDocuments] = useState([]);
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
-  const [statusFilter, setStatusFilter] = useState(""); // State for status filter
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  // const [statusFilter, setStatusFilter] = useState(""); // State for status filter
+  // const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+const [statusFilter, setStatusFilter] = useState('');
+const [documents, setDocuments] = useState([]); // Should be an array
+const [users, setUsers] = useState([]); 
+
 
   useEffect(() => {
     axios
-      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/list")
+      .get("http://localhost:3000/documents/list")
       .then((response) => {
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
@@ -23,15 +28,25 @@ const VerifyDocuments = () => {
       .catch((error) => console.error("Error fetching documents:", error));
 
     axios
-      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors")
+      .get("http://localhost:3000/users/distributors")
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
+
+      
     axios
-      .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
+      .get("http://localhost:3000/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
+
+
+
+      axios
+      .get("http://localhost:3000/users/register")
+      .then((response) => setUsers(response.data))
+      .catch((error) => console.error("Error fetching users:", error));
   }, []);
+
 
   // Function to handle status filter change
   const handleStatusFilterChange = (e) => {
@@ -40,26 +55,35 @@ const VerifyDocuments = () => {
 
   // Function to handle search query change
   const handleSearchQueryChange = (e) => {
-    setSearchQuery(e.target.value.toLowerCase());
+    setSearchQuery(e.target.value); // No need to convert to lowercase here
   };
+  
 
   // Filter documents based on selected status
   const filteredDocuments = documents
-    .filter((doc) =>
-      statusFilter ? doc.status.toLowerCase() === statusFilter.toLowerCase() : true
-    )
-    .filter((doc) =>
-      searchQuery
-        ? doc.document_id.toLowerCase().includes(searchQuery) ||
-        doc.name.toLowerCase().includes(searchQuery) ||
-        doc.email.toLowerCase().includes(searchQuery) ||
-        doc.phone.toLowerCase().includes(searchQuery)
-        : true
+  .filter((doc) =>
+    statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
+  )
+  .filter((doc) => {
+    if (!searchQuery) return true;
+
+    const lowerQuery = searchQuery.toLowerCase();
+
+    return (
+      doc.document_id?.toString().toLowerCase().includes(lowerQuery) ||
+      doc.name?.toLowerCase().includes(lowerQuery) ||
+      doc.email?.toLowerCase().includes(lowerQuery) ||
+      doc.phone?.toString().toLowerCase().includes(lowerQuery) ||
+      doc.category_name?.toLowerCase().includes(lowerQuery) ||
+      doc.subcategory_name?.toLowerCase().includes(lowerQuery) ||
+      doc.address?.toLowerCase().includes(lowerQuery)
     );
+  });
+
 
   const handleUpdateStatus = async (documentId, newStatus) => {
     try {
-      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
+      await axios.put(`http://localhost:3000/documents/update-status/${documentId}`, {
         status: newStatus,
       });
       setDocuments((prev) =>
@@ -73,23 +97,12 @@ const VerifyDocuments = () => {
     }
   };
 
-  const handleAssignDistributor = async (documentId, distributorId) => {
-    if (!distributorId) return;
-    try {
-      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/assign-distributor/${documentId}`, {
-        distributor_id: distributorId,
-      });
-      setDocuments((prev) =>
-        prev.map((doc) =>
-          doc.document_id === documentId ? { ...doc, distributor_id: distributorId } : doc
-        )
-      );
-      alert("Distributor assigned successfully!");
-    } catch (error) {
-      console.error("Error assigning distributor:", error);
-      alert("Failed to assign distributor.");
-    }
+  // Function to get distributor name by ID
+  const getDistributorName = (distributorId) => {
+    const distributor = users.find((user) => Number(user.user_id) === Number(distributorId));
+    return distributor ? distributor.name : "";
   };
+  
 
 
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
@@ -116,7 +129,7 @@ const VerifyDocuments = () => {
       return;
     }
     try {
-      const response = await axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates/${certificateId}`);
+      const response = await axios.get(`http://localhost:3000/certificates/${certificateId}`);
       if (response.data && response.data.file_url) {
         window.open(response.data.file_url, "_blank");
       } else {
@@ -133,106 +146,110 @@ const VerifyDocuments = () => {
   
 
   return (
-    <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6">
-        <h2 className="text-xl font-bold text-center mb-6 text-gray-800">Verify Documents</h2>
-
-        {/* Flexbox container for Status Filter and Search Bar */}
-        <div className="mb-4 flex justify-between items-center">
-          {/* Status Filter Dropdown */}
-          <div className="mr-4">
-            <label htmlFor="statusFilter" className="mr-2 text-sm">Filter by Status:</label>
-            <select
-              id="statusFilter"
-              value={statusFilter}
-              onChange={handleStatusFilterChange}
-              className="p-2 border rounded text-sm"
-            >
-              <option value="">All</option>
-              <option value="Approved">Approved</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Completed">Completed</option>
-            </select>
+    <div className="ml-[295px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
+      <div className="w-full p-6 bg-white rounded-lg shadow-lg"> {/* White container with shadow */}
+        {/* Header and Filters in the Same Row */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-gray-800">Verify Documents</h2>
+  
+          {/* Flex container for Status Filter and Search Bar */}
+          <div className="flex items-center space-x-4">
+            {/* Status Filter Dropdown */}
+            <div>
+              <label htmlFor="statusFilter" className="mr-2">Filter by Status:</label>
+              <select
+                id="statusFilter"
+                value={statusFilter}
+                onChange={handleStatusFilterChange}
+                className="p-2 border rounded"
+              >
+                <option value="">All</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+  
+            {/* Search Bar */}
+            <input
+              type="text"
+              placeholder="Search documents..."
+              value={searchQuery}
+              onChange={handleSearchQueryChange}
+              className="p-2 border rounded w-[200px]"
+            />
           </div>
-
-          {/* Search Bar */}
-          <input
-            type="text"
-            placeholder="Search documents..."
-            value={searchQuery}
-            onChange={handleSearchQueryChange}
-            className="p-2 border rounded w-[200px] text-sm" // Decreased the width for the search bar
-          />
         </div>
-
-        <div className="table-container overflow-x-auto overflow-y-auto max-h-[550px]">
+  
+        {/* Table Container */}
+        <div className="table-container border border-gray-300 rounded-lg shadow-md">
           <table className="table border-collapse border border-gray-300 min-w-full">
-            <thead className="sticky-header">
+            <thead className="bg-gray-300 ">
               <tr>
-                <th className="border p-2 text-center text-sm font-semibold">Sr No.</th>
-                <th className="border p-2 text-center text-sm font-semibold">Document Id</th>
-                <th className="border p-2 text-sm font-semibold">Category</th>
-                <th className="border p-2 text-sm font-semibold">Subcategory</th>
-                <th className="border p-2 text-sm font-semibold">Name</th>
-                <th className="border p-2 text-sm font-semibold">Email</th>
-                <th className="border p-2 text-sm font-semibold">Phone</th>
-                <th className="border p-2 text-sm font-semibold">Address</th>
-            
-                <th className="border p-2 text-sm font-semibold">Verification</th>
-                <th className="border p-2 text-sm font-semibold">Completed</th>
-                <th className="border p-2 text-sm font-semibold">Action</th>
-                <th className="border p-2 text-sm font-semibold">View</th>
-                
-                <th className="border p-2 text-sm font-semibold">Certificate</th>
-                
+                <th className="border p-2 text-center font-bold">Sr No.</th>
+                <th className="border p-2 text-center font-bold">Application Id</th>
+                <th className="border p-2 font-bold">Category</th>
+                <th className="border p-2 font-bold">Subcategory</th>
+                <th className="border p-2 font-bold">Name</th>
+                <th className="border p-2 font-bold">Email</th>
+                {/* <th className="border p-2 font-bold">Phone</th> */}
+
+                <th className="border p-2 font-bold">Assign Distributor</th>
+                <th className="border p-2 font-bold">Verification</th>
+                <th className="border p-2 font-bold">Completed</th>
+                <th className="border p-2 font-bold">Action</th>
+                <th className="border p-2 font-bold">View</th>
+                <th className="border p-2 font-bold">Certificate</th>
               </tr>
             </thead>
             <tbody>
               {filteredDocuments.map((doc, index) => (
-                <tr key={doc.document_id} className="border-t hover:bg-gray-100">
-                  <td className="border p-2 text-center text-sm">{index + 1}</td>
-                  <td className="border p-2 text-center text-sm">{doc.document_id}</td>
-                  <td className="border p-2 text-sm">{doc.category_name}</td>
-                  <td className="border p-2 text-sm">{doc.subcategory_name}</td>
-                  <td className="border p-2 text-sm">{doc.name}</td>
-                  <td className="border p-2 text-sm">{doc.email}</td>
-                  <td className="border p-2 text-sm">{doc.phone}</td>
-                  <td className="border p-2 text-sm">{doc.address}</td>
+                <tr
+                  key={doc.document_id}
+                  className={`border-t ${index % 2 === 0 ? "bg-white" : "bg-white"} hover:bg-gray-100`}
+                >
+                  <td className="border p-2 text-center">{index + 1}</td>
+                  <td className="border p-2 text-center">{doc.application_id}</td>
+                  <td className="border p-2">{doc.category_name}</td>
+                  <td className="border p-2">{doc.subcategory_name}</td>
+                  <td className="border p-2">{doc.name}</td>
+                  <td className="border p-2 break-words">{doc.email}</td>
+                  {/* <td className="border p-2">{doc.phone}</td> */}
+                  <td className="border p-2">{getDistributorName(doc.distributor_id)}</td> 
 
-
-                  <td className="border p-2 text-sm">
+                  <td className="border p-2">
                     <span
-                      className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Approved"
-                        ? "bg-green-500"
-                        : doc.status === "Rejected"
+                      className={`px-3 py-1 rounded-full text-white text-sm ${
+                        doc.status === "Approved"
+                          ? "bg-green-500"
+                          : doc.status === "Rejected"
                           ? "bg-red-500"
                           : "bg-blue-500"
-                        }`}
+                      }`}
                     >
                       {doc.status}
                     </span>
                   </td>
-                  <td className="p-3 flex justify-center space-x-2 text-sm">
-                    
-                    <button
-                      onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
-                      className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
-                    >
-                      <FaCheck className="text-white" />
-                    </button>
-                  </td>
+  
+                  <td className="border p-2">
+  <button
+    onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
+    className="bg-blue-900 rounded flex justify-center items-center hover:bg-blue-600 px-3 py-1 text-white text-sm"
+  >
+    <FaCheck className="text-white" />
+  </button>
+</td>
 
-
-
-<td className="border p-2 text-center">
+  
+                  <td className="border p-2 text-center">
                     <button
                       onClick={() => handleViewInvoice(doc.document_id)}
-                      className="bg-indigo-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-indigo-600 transition"
+                      className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition"
                     >
-                      <FaFileInvoice className="mr-1" /> Verify
+                      <FaFileInvoice className="mr-1" /> Action
                     </button>
                   </td>
-
+  
                   <td className="border p-2 text-center">
                     <button
                       onClick={() => handleView(doc.document_id)}
@@ -241,26 +258,19 @@ const VerifyDocuments = () => {
                       <FaFileInvoice className="mr-1" /> View
                     </button>
                   </td>
-
-                  <td className="border p-2 text-sm">
+  
+                  <td className="border p-2">
                     {getCertificateByDocumentId(doc.document_id) ? (
                       <button
                         onClick={() => handleViewCertificate(doc.document_id)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-blue-600 transition"
+                        className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
                       >
-                        View Certificate
+                        Certificate
                       </button>
                     ) : (
                       <span>No Certificate</span>
                     )}
-
-
-
                   </td>
-
-
-               
-                  
                 </tr>
               ))}
             </tbody>
@@ -269,6 +279,5 @@ const VerifyDocuments = () => {
       </div>
     </div>
   );
-};
-
+};  
 export default VerifyDocuments;

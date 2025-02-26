@@ -15,6 +15,9 @@ const Sidebar = ({ activePath, onNavigate }) => {
     const menuItems = [
         { icon: <FaPlus />, label: "Dashboard", path: "/Ddashinner" },
         { icon: <FaFileAlt />, label: "Distributorverify", path: "/Distributorverify" },
+        { icon: <FaFileAlt />, label: "Verify History", path: "/Distributorverifyhistory" },
+        { icon: <FaFileAlt />, label: "Distributor request", path: "/Distributorrequest" },
+        { icon: <FaFileAlt />, label: "Request History", path: "/Distributorhistory" },
     ];
 
     return (

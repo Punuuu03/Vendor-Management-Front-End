@@ -36,6 +36,22 @@ import Usercompletedlist from './Components/Usercompletedlist';
 import Checkapplication from './Components/Checkapplication';
 import Invoice from './Components/Invoice';
 import View from './Components/View';
+import Userlist from './Components/Userlist';
+import Distributorlistonly from './Components/Distributorlistonly';
+import Addnotifications from './Components/Addnotifications';
+import Clistpage from './Components/Clistpage';
+import Adderrorrequest from './Components/Adderrorrequest';
+import Customerhistory from './Components/Customerhistory';
+import Adminrequest from './Components/Adminrequest';
+import Distributorrequest from './Components/Distributorrequest';
+import Distributorinvoice from './Components/Distributorinvoice';
+import Distributorview from './Components/Distributorview';
+import Distributorhistory from './Components/Distributorhistory';
+import Distributorverifyhistory from './Components/Distributorverifyhistory';
+import Customererrorhistory from './Components/Customererrorhistory';
+import Customerinvoice from './Components/Customerinvoice';
+import Customerview from './Components/Customerview';
+import Adminerrorhistory from './Components/Adminerrorhistory';
 
 
 function App() {
@@ -59,6 +75,11 @@ function App() {
         <Route path="/distributorlist" element={<Admindashboard><DistributorList /></Admindashboard>} />
         <Route path="/Distributorregister" element={<Admindashboard><Distributorregister /></Admindashboard>} />
         <Route path="/Recentapplications" element={<Admindashboard><Recentapplications /></Admindashboard>} />
+        <Route path="/Userlist" element={<Admindashboard><Userlist /></Admindashboard>} />
+        <Route path="/Distributorlistonly" element={<Admindashboard><Distributorlistonly /></Admindashboard>} />
+        <Route path="/Addnotifications" element={<Admindashboard><Addnotifications /></Admindashboard>} />
+        <Route path="/Adminrequest" element={<Admindashboard><Adminrequest /></Admindashboard>} />
+        <Route path="/Adminerrorhistory" element={<Admindashboard><Adminerrorhistory /></Admindashboard>} />
 
         <Route path="/Customerdashboard" element={<Customerdashboard />} />
         <Route path="/Cdashinner" element={<Customerdashboard><Cdashinner /></Customerdashboard>} />
@@ -66,20 +87,27 @@ function App() {
         <Route path="/Usercompletedlist" element={<Customerdashboard><Usercompletedlist /></Customerdashboard>} />
         <Route path="/Customerapply" element={<Customerdashboard><Customerapply /></Customerdashboard>} />
         <Route path="/Checkapplication" element={<Customerdashboard><Checkapplication /></Customerdashboard>} />
-        {/* <Route path="/About" element={<Customerdashboard><About /></Customerdashboard>} /> */}
-        {/* <Route path="/distributor-dashboard" element={<DistributorDashboard />} />  */}
-        {/* <Route path="/Contact" element={<Customerdashboard><Contact /></Customerdashboard>} /> */}
+        <Route path="/Adderrorrequest" element={<Customerdashboard><Adderrorrequest /></Customerdashboard>} />
+        <Route path="/Customerhistory" element={<Customerdashboard><Customerhistory /></Customerdashboard>} /> 
+        <Route path="/Customererrorhistory" element={<Customerdashboard><Customererrorhistory /></Customerdashboard>} />
         <Route path="/Apply" element={<Customerdashboard><Apply /></Customerdashboard>} />
         <Route path="/Category" element={<Customerdashboard><Category /></Customerdashboard>} />
         <Route path="/process" element={<Customerdashboard><Process /></Customerdashboard>} />
-
+        <Route path="/Clistpage" element={<Customerdashboard><Clistpage /></Customerdashboard>} />
+        <Route path="/Customerinvoice/:documentId" element={<Customerinvoice />} />
+        <Route path="/Customerview/:documentId" element={<Customerview />} />
         <Route path="/Distributordashboard" element={<Distributordashboard />} />
         <Route path="/Ddashinner" element={<Distributordashboard><Ddashinner /></Distributordashboard>} />
+        <Route path="/Distributorrequest" element={<Distributordashboard><Distributorrequest /></Distributordashboard>} />
 
         <Route path="/Distributorverify" element={<Distributordashboard><Distributorverify /></Distributordashboard>} />
+        <Route path="/Distributorverifyhistory" element={<Distributordashboard><Distributorverifyhistory /></Distributordashboard>} />
 
 
         <Route path="/Dlistpage" element={<Distributordashboard><Dlistpage /></Distributordashboard>} />
+        <Route path="/Distributorhistory" element={<Distributordashboard><Distributorhistory /></Distributordashboard>} />
+        <Route path="/Distributorinvoice/:documentId" element={<Distributorinvoice />} />
+        <Route path="/Distributorview/:documentId" element={<Distributorview />} />
 
       </Routes>
     </Router>

@@ -56,117 +56,131 @@ const DistributorList = () => {
     };
 
     const handleDeleteDistributor = async (id) => {
-        const confirmDelete = await Swal.fire({
-            title: "Are you sure?",
-            text: "This distributor will be deleted permanently!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Yes, delete it!",
-        });
-
-        if (confirmDelete.isConfirmed) {
-            try {
-                await axios.delete(`${apiUrl}/${id}`);
-                setDistributors(distributors.filter((distributor) => distributor.user_id !== id));
-                Swal.fire("Deleted!", "Distributor has been deleted.", "success");
-            } catch (error) {
-                console.error("Error deleting distributor:", error);
-                Swal.fire("Error", "Failed to delete distributor", "error");
-            }
-        }
-    };
-
+      const confirmDelete = await Swal.fire({
+          title: "Enter Deletion Code",
+          text: "Please enter the code to confirm deletion.",
+          input: "text",
+          inputPlaceholder: "Enter code here...",
+          inputAttributes: {
+              autocapitalize: "off"
+          },
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Delete",
+          showLoaderOnConfirm: true,
+          preConfirm: (inputValue) => {
+              if (inputValue !== "0000") {
+                  Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
+                  return false;
+              }
+              return true;
+          },
+          allowOutsideClick: () => !Swal.isLoading()
+      });
+  
+      if (confirmDelete.isConfirmed) {
+          // Show success message immediately before making API call
+          Swal.fire("Deleted!", "Distributor has been deleted.", "success");
+  
+          try {
+              await axios.delete(`${apiUrl}/distributors/${id}`);
+              setDistributors((prevDistributors) => 
+                  prevDistributors.filter((distributor) => distributor.user_id !== id)
+              );
+          } catch (error) {
+              console.error("Error deleting distributor:", error);
+              Swal.fire("Error", "Failed to delete distributor", "error");
+          }
+      }
+  };
+  
     return (
         <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-            {/* Top Section - Heading & Add Distributor Button */}
-            <div className="w-full max-w-7xl bg-white p-6 shadow-lg flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-gray-800">Manage Distributors</h2>
-                <button
-                    onClick={() => navigate("/Distributorregister")}
-                    className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-900 transition duration-200"
-                >
-                    <FaPlus /> Add Distributor
-                </button>
-            </div>
+      {/* Distributor List Section */}
+      <div className="w-full max-w-9xl bg-white p-6 shadow-lg">
+        {/* Header and Add Distributor Button in the Same Row */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-gray-800">Distributor List</h2>
+          <button
+            onClick={() => navigate("/Distributorregister")}
+            className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-900 transition duration-200"
+          >
+            <FaPlus /> Add Distributor
+          </button>
+        </div>
 
-            {/* Distributor List Section */}
-            <div className="w-full max-w-9xl bg-white p-6 shadow-lg mt-6">
-    <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Distributor List</h2>
-
-    {/* Scrollable Table Wrapper */}
-    <div className="overflow-y-auto max-h-[70vh] border border-gray-300"> {/* Increased the height */}
-        <table className="w-full border-collapse">
+        {/* Scrollable Table Wrapper */}
+        <div className="overflow-y-auto max-h-[70vh] border border-gray-300">
+          <table className="w-full border-collapse">
             <thead className="bg-gray-300 text-black sticky top-0">
-                <tr>
-                    <th className="p-3 text-left border-r border-gray-400">ID</th>
-                    <th className="p-3 text-left border-r border-gray-400">Name</th>
-                    <th className="p-3 text-left border-r border-gray-400">Email</th>
-                    <th className="p-3 text-left border-r border-gray-400">Password</th>
-                    <th className="p-3 text-center">Actions</th>
-                </tr>
+              <tr>
+                <th className="p-3 text-left border-r border-gray-400">ID</th>
+                <th className="p-3 text-left border-r border-gray-400">Name</th>
+                <th className="p-3 text-left border-r border-gray-400">Email</th>
+                <th className="p-3 text-left border-r border-gray-400">Password</th>
+                <th className="p-3 text-center">Actions</th>
+              </tr>
             </thead>
             <tbody>
-                {distributors.length > 0 ? (
-                    distributors.map((distributor, index) => (
-                        <tr
-                            key={distributor.user_id}
-                            className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+              {distributors.length > 0 ? (
+                distributors.map((distributor, index) => (
+                  <tr
+                    key={distributor.user_id}
+                    className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
+                  >
+                    <td className="p-3 border-r border-gray-400">{distributor.user_id}</td>
+                    <td className="p-3 border-r border-gray-400">{distributor.name}</td>
+                    <td className="p-3 border-r border-gray-400">{distributor.email}</td>
+                    <td className="p-3 border-r border-gray-400">
+                      {editingId === distributor.user_id ? (
+                        <input
+                          type="text"
+                          value={updatedPassword}
+                          onChange={(e) => setUpdatedPassword(e.target.value)}
+                          className="border border-gray-400 p-2 rounded w-full"
+                        />
+                      ) : (
+                        distributor.password // Show password directly as per request
+                      )}
+                    </td>
+                    <td className="p-3 text-center">
+                      {editingId === distributor.user_id ? (
+                        <button
+                          onClick={() => handleUpdateDistributor(distributor.user_id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
                         >
-                            <td className="p-3 border-r border-gray-400">{distributor.user_id}</td>
-                            <td className="p-3 border-r border-gray-400">{distributor.name}</td>
-                            <td className="p-3 border-r border-gray-400">{distributor.email}</td>
-                            <td className="p-3 border-r border-gray-400">
-                                {editingId === distributor.user_id ? (
-                                    <input
-                                        type="password"
-                                        value={updatedPassword}
-                                        onChange={(e) => setUpdatedPassword(e.target.value)}
-                                        className="border border-gray-400 p-2 rounded"
-                                    />
-                                ) : (
-                                    distributor.password // Show password directly as per request
-                                )}
-                            </td>
-                            <td className="p-3 text-center">
-                                {editingId === distributor.user_id ? (
-                                    <button
-                                        onClick={() => handleUpdateDistributor(distributor.user_id)}
-                                        className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
-                                    >
-                                        Save
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => handleEditDistributor(distributor.user_id, distributor.password)}
-                                        className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                                    >
-                                        <FaEdit />
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => handleDeleteDistributor(distributor.user_id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                >
-                                    <FaTrash />
-                                </button>
-                            </td>
-                        </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td colSpan="5" className="p-3 text-center text-gray-500">
-                            No distributors found
-                        </td>
-                    </tr>
-                )}
+                          Save
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleEditDistributor(distributor.user_id, distributor.password)}
+                          className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                        >
+                          <FaEdit />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteDistributor(distributor.user_id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                      >
+                        <FaTrash />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" className="p-3 text-center text-gray-500">
+                    No distributors found
+                  </td>
+                </tr>
+              )}
             </tbody>
-        </table>
-    </div>
-</div>
-
+          </table>
         </div>
+      </div>
+    </div>
     );
 };
 

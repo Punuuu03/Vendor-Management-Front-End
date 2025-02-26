@@ -48,6 +48,8 @@ const Sidebar = ({ onNavigate }) => {
             { icon: <FaTachometerAlt />, label: "Dashboard", path: "/Cdashinner" },  // Dashboard icon
             { icon: <FaTachometerAlt />, label: "Check Application", path: "/Checkapplication" },  // Dashboard icon
             { icon: <FaFileAlt />, label: "Fill Form", path: "/Category" },
+            { icon: <FaFileAlt />, label: "History", path: "/Customerhistory" },
+            { icon: <FaFileAlt />, label: "Request History", path: "/Customererrorhistory" },
 
             { icon: <FaClipboardList />, label: "Applications", path: "/customerapply" },  // Clipboard/list icon for applications
 
@@ -99,8 +101,8 @@ const Customerdashboard = ({ children }) => {
       <Sidebar onNavigate={(path) => navigate(path)} />
       <div className="flex-1 p-6">
         {/* Top Section (Navbar) */}
-        <div className="flex items-center justify-between bg-[#00234E] text-white p-4 rounded-md shadow-md ml-[330px] fixed top-0 left-0 w-[80%] z-10">
-          <span className="text-lg font-bold">Customer Dashboard</span>
+        <div className="flex items-center justify-between bg-[#00234E] text-white px-4 py-2 rounded-md shadow-md fixed top-0 left-[20%] w-[80%] z-10 h-[65px]">
+        <span className="text-lg font-bold">Customer Dashboard</span>
 
           {/* Profile Section */}
           <div className="relative">

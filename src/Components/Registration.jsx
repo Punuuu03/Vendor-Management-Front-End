@@ -13,21 +13,52 @@ const Register = () => {
   });
 
   const [categories, setCategories] = useState([]);
+  const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories");
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+   useEffect(() => {
+      const fetchCategories = async () => {
+        try {
+          const response = await fetch("http://localhost:3000/categories");
+          if (!response.ok) {
+            throw new Error("Failed to fetch categories");
+          }
+          const data = await response.json();
+          setCategories(data);
+        } catch (error) {
+          console.error("Error fetching categories:", error);
+        }
+      };
+      fetchCategories();
+    }, []);
+  
+    // Fetch subcategories when categories are available
+    useEffect(() => {
+      const fetchSubcategories = async () => {
+        try {
+          const subcategoryData = {};
+          for (const category of categories) {
+            const response = await fetch(
+              `http://localhost:3000/subcategories/category/${category.category_id}`
+            );
+            if (response.ok) {
+              const data = await response.json();
+              subcategoryData[category.category_id] = data;
+            } else {
+              subcategoryData[category.category_id] = [];
+            }
+          }
+          setSubcategories(subcategoryData);
+        } catch (error) {
+          console.error("Error fetching subcategories:", error);
+        }
+      };
+  
+      if (categories.length > 0) {
+        fetchSubcategories();
       }
-    };
-    fetchCategories();
-  }, []);
-
+    }, [categories]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "phone" && (!/^\d*$/.test(value) || value.length > 10)) return;
@@ -38,13 +69,13 @@ const Register = () => {
     e.preventDefault();
     const userData = { ...formData, role: "Customer", user_login_status: "Approve" };
     try {
-      const response = await fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register", {
+      const response = await fetch("http://localhost:3000/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         Swal.fire({
           title: "Registration Successful!",
@@ -93,14 +124,28 @@ const Register = () => {
           <p className="mt-4 text-center">Already have an account? <Link to="/" className="text-[#1e293b] hover:underline">Login</Link></p>
         </div>
 
-        {/* Right Column - Document List */}
+        {/* Right Column - Document List with Categories & Subcategories */}
         <div className="w-3/5 p-8 bg-white shadow-lg border border-gray-200 overflow-y-auto max-h-[80vh] rounded-lg">
           <h2 className="text-2xl text-[#00234E] font-bold mb-4 text-center">Government Document Services</h2>
           <ul className="grid grid-cols-2 gap-6">
             {categories.map((category) => (
-              <li key={category.category_id} className="flex items-center space-x-2 text-gray-700 border-b pb-2">
-                <span className="text-black text-sm">⚫</span>
-                <span>{category.category_name}</span>
+              <li key={category.category_id} className="text-gray-700 border-b pb-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-black text-sm">⚫</span>
+                  <span>{category.category_name}</span>
+                </div>
+
+                {/* Subcategories as sub-bullets */}
+                {subcategories[category.category_id]?.length > 0 && (
+                  <ul className="ml-6 mt-2">
+                    {subcategories[category.category_id]?.map((sub) => (
+                      <li key={sub.subcategory_id} className="flex items-center space-x-2 text-gray-600">
+                        <span className="text-gray-500 text-xs">●</span>
+                        <span className="text-sm">{sub.subcategory_name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>

@@ -19,6 +19,7 @@ const Ddashinner = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryCounts, setCategoryCounts] = useState({});
   const [subcategoryCounts, setSubcategoryCounts] = useState({});
+  const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
 
 
@@ -149,6 +150,25 @@ const Ddashinner = () => {
     }
   }, [distributorId]);
 
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/notifications/active');
+      const distributorNotifications = response.data.filter(
+        (notif) => notif.distributor_notification && notif.notification_status === 'Active'
+      );
+      setNotifications(distributorNotifications);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -223,10 +243,23 @@ const Ddashinner = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100 p-6 ml-[300px]">
-      <div className="w-full p-6">
+     
+
+      {/* <div className="w-full p-6"> */}
+      
 
         <div className="w-full max-w-7xl bg-white p-6 shadow-lg">
-
+        <div className="mb-6">
+  {notifications.length > 0 &&
+    notifications.map((notif, index) => (
+      notif.distributor_notification && (
+        <marquee key={index} className="text-lg font-semibold text-blue-600 mb-2">
+          📢 {notif.distributor_notification}
+        </marquee>
+      )
+    ))
+  }
+</div>
           <Grid container spacing={3}>
 
             {/* Cards for Total Documents, Total Users, Total Completed Certified Users */}
@@ -338,7 +371,7 @@ const Ddashinner = () => {
           </Grid>
         </div>
       </div>
-    </div>
+ 
   );
 };
 

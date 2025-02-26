@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend, BarElement, CategoryScal
 import { FaHourglassHalf, FaCheckCircle, FaTimesCircle, FaUsers, FaStore, FaFileAlt, FaCogs, FaBoxes, FaClipboardList } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import { Link } from "react-router-dom";
 // Register the chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, BarElement, CategoryScale, LinearScale, PointElement, LineElement);
 
@@ -172,25 +172,34 @@ const Adashinner = () => {
       <h2 className="text-2xl font-bold mb-4">Total Counts</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
         {/* Users Card */}
-        <div className="w-full p-4 bg-white rounded shadow">
-          <FaUsers className="text-4xl mb-2 mx-auto text-gray-500" />
-          <h3 className="text-lg font-semibold text-center mb-2">Users</h3>
-          <p className="text-center text-2xl">{totalCounts.users}</p>
-        </div>
+        <div className="w-full p-4 bg-white rounded shadow cursor-pointer hover:shadow-lg transition">
+  <Link to="/Userlist" className="block">
+    <FaUsers className="text-4xl mb-2 mx-auto text-gray-500" />
+    <h3 className="text-lg font-semibold text-center mb-2">Users</h3>
+    <p className="text-center text-2xl">{totalCounts.users}</p>
+  </Link>
+</div>
 
-        {/* Distributors Card */}
-        <div className="w-full p-4 bg-white rounded shadow">
-          <FaStore className="text-4xl mb-2 mx-auto text-gray-500" />
-          <h3 className="text-lg font-semibold text-center mb-2">Distributors</h3>
-          <p className="text-center text-2xl">{totalCounts.distributors}</p>
-        </div>
+<div className="w-full p-4 bg-white rounded shadow cursor-pointer hover:shadow-lg transition">
+  <Link to="/Distributorlistonly" className="block">
+    <FaStore className="text-4xl mb-2 mx-auto text-gray-500" />
+    <h3 className="text-lg font-semibold text-center mb-2">Distributors</h3>
+    <p className="text-center text-2xl">{totalCounts.distributors}</p>
+  </Link>
+</div>
 
-        {/* Documents Card */}
-        <div className="w-full p-4 bg-white rounded shadow">
-          <FaFileAlt className="text-4xl mb-2 mx-auto text-gray-500" />
-          <h3 className="text-lg font-semibold text-center mb-2">Documents</h3>
-          <p className="text-center text-2xl">{totalCounts.documents}</p>
-        </div>
+
+
+<div className="w-full p-4 bg-white rounded shadow cursor-pointer hover:shadow-lg transition">
+  <Link to="/Verifydocuments" className="block">
+    <FaFileAlt className="text-4xl mb-2 mx-auto text-gray-500" />
+    <h3 className="text-lg font-semibold text-center mb-2">Documents</h3>
+    <p className="text-center text-2xl">{totalCounts.documents}</p>
+  </Link>
+</div>
+       
+
+      
 
         {/* Categories Card */}
         <div className="w-full p-4 bg-white rounded shadow">

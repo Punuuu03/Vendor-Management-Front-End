@@ -16,6 +16,7 @@ const AddCategory = () => {
     fetchCategories();
   }, []);
 
+  // Fetch Categories
   const fetchCategories = async () => {
     try {
       const response = await axios.get(apiUrl);
@@ -25,6 +26,7 @@ const AddCategory = () => {
     }
   };
 
+  // Add Category
   const handleAddCategory = async () => {
     if (!categoryName.trim()) {
       Swal.fire("Error", "Category name cannot be empty!", "error");
@@ -32,9 +34,7 @@ const AddCategory = () => {
     }
 
     try {
-      console.log("Adding category:", categoryName); // Log the category name
       const response = await axios.post(apiUrl, { category_name: categoryName });
-      console.log("Category added:", response.data); // Check the response from the backend
       setCategories([...categories, response.data]);
       setCategoryName("");
       Swal.fire("Success", "Category added successfully!", "success");
@@ -44,6 +44,13 @@ const AddCategory = () => {
     }
   };
 
+  // Start Editing Category
+  const handleEditCategory = (id, currentName) => {
+    setEditingId(id);
+    setUpdatedName(currentName);
+  };
+
+  // Update Category
   const handleUpdateCategory = async (id) => {
     if (!updatedName.trim()) {
       Swal.fire("Error", "Category name cannot be empty!", "error");
@@ -51,9 +58,7 @@ const AddCategory = () => {
     }
 
     try {
-      console.log("Updating category:", updatedName); // Log the updated category name
       const response = await axios.patch(`${apiUrl}/${id}`, { category_name: updatedName });
-      console.log("Category updated:", response.data); // Check the response from the backend
 
       setCategories(
         categories.map((category) =>
@@ -70,17 +75,29 @@ const AddCategory = () => {
     }
   };
 
-
-
+  // Delete Category with Code Verification
   const handleDeleteCategory = async (id) => {
     const confirmDelete = await Swal.fire({
-      title: "Are you sure?",
-      text: "This category will be deleted permanently!",
-      icon: "warning",
+      title: "Enter Deletion Code",
+      text: "Please enter the code to confirm deletion.",
+      input: "text",
+      inputPlaceholder: "Enter code here...",
+      inputAttributes: {
+        autocapitalize: "off"
+      },
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Delete",
+      showLoaderOnConfirm: true,
+      preConfirm: (inputValue) => {
+        if (inputValue !== "0000") {
+          Swal.showValidationMessage("Incorrect code! Deletion not allowed.");
+          return false;
+        }
+        return true;
+      },
+      allowOutsideClick: () => !Swal.isLoading()
     });
 
     if (confirmDelete.isConfirmed) {
@@ -97,8 +114,8 @@ const AddCategory = () => {
 
   return (
     <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      {/* Right Section - Add Category */}
-      <div className="w-full p-6">
+      {/* Add Category Section */}
+      <div className="w-full">
         <div className="w-full max-w-7xl bg-white p-3 shadow-lg">
           <h2 className="text-2xl font-bold text-center mb-2 text-gray-800">Category</h2>
 
@@ -124,7 +141,6 @@ const AddCategory = () => {
         <div className="w-full mt-5 bg-white p-5 shadow-lg">
           <h2 className="text-xl font-bold text-center mb-4 text-gray-800">Category List</h2>
 
-          {/* Scrollable Table Wrapper */}
           <div className="overflow-y-auto max-h-70 border border-gray-300">
             <table className="w-full border-collapse">
               <thead className="bg-gray-300 text-black sticky top-0">
@@ -145,24 +161,24 @@ const AddCategory = () => {
                             type="text"
                             value={updatedName}
                             onChange={(e) => setUpdatedName(e.target.value)}
-                            className="border border-gray-400 p-2 rounded"
+                            className="border border-gray-400 p-2 rounded w-full"
                           />
                         ) : (
                           category.category_name
                         )}
                       </td>
-                      <td className="p-3 text-center">
+                      <td className="p-3 text-center flex justify-center space-x-2">
                         {editingId === category.category_id ? (
                           <button
                             onClick={() => handleUpdateCategory(category.category_id)}
-                            className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                           >
                             Save
                           </button>
                         ) : (
                           <button
                             onClick={() => handleEditCategory(category.category_id, category.category_name)}
-                            className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
+                            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                           >
                             <FaEdit />
                           </button>
