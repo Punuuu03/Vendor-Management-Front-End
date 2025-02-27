@@ -153,7 +153,7 @@ const Ddashinner = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/notifications/active');
+      const response = await axios.get('https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications/active');
       const distributorNotifications = response.data.filter(
         (notif) => notif.distributor_notification && notif.notification_status === 'Active'
       );

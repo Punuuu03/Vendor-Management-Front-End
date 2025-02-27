@@ -21,8 +21,8 @@ const CustomerDashboard = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const API_BASE_URL = "http://localhost:3000/categories";
-  const SUBCATEGORIES_API_URL = "http://localhost:3000/subcategories";
+  const API_BASE_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories";
+  const SUBCATEGORIES_API_URL = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories";
 
   // Decode token and set user ID
   useEffect(() => {
@@ -38,17 +38,17 @@ const CustomerDashboard = () => {
     if (!userId) return;
 
     // Fetch applied applications count
-    axios.get(`http://localhost:3000/userdashboard/total-applied/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/total-applied/${userId}`)
       .then(res => setAppliedCount(res.data.totalCount))
       .catch(err => console.error("Error fetching total applied:", err));
 
     // Fetch completed applications count
-    axios.get(`http://localhost:3000/userdashboard/total-completed/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/total-completed/${userId}`)
       .then(res => setCompletedCount(res.data.totalCompleted))
       .catch(err => console.error("Error fetching total completed:", err));
 
     // Fetch category counts
-    axios.get(`http://localhost:3000/userdashboard/category-counts/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/category-counts/${userId}`)
       .then(res => {
         const dataWithColors = res.data.map((item, index) => ({
           name: item.category,
@@ -61,7 +61,7 @@ const CustomerDashboard = () => {
       .catch(err => console.error("Error fetching category data:", err));
 
     // Fetch application status counts
-    axios.get(`http://localhost:3000/userdashboard/status-count/${userId}`)
+    axios.get(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/userdashboard/status-count/${userId}`)
       .then(res => {
         const formattedData = res.data.map(item => ({
           status: item.status,
@@ -72,7 +72,7 @@ const CustomerDashboard = () => {
       .catch(err => console.error("Error fetching status counts:", err));
 
     // Fetch active notifications
-    axios.get("http://localhost:3000/notifications/active")
+    axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/notifications/active")
       .then(res => setNotifications(res.data))
       .catch(err => console.error("Error fetching notifications:", err));
 
