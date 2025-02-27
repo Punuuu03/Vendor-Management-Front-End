@@ -312,7 +312,7 @@ const Apply = () => {
 
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold text-lg">
-              Additional Fields <span className="text-red-500">*</span>
+              Applicant Information <span className="text-red-500">*</span>
             </label>
             <div className="grid grid-cols-3 gap-6">
               {fieldNames.map((field, index) => (
