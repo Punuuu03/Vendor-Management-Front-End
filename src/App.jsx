@@ -52,6 +52,7 @@ import Customererrorhistory from './Components/Customererrorhistory';
 import Customerinvoice from './Components/Customerinvoice';
 import Customerview from './Components/Customerview';
 import Adminerrorhistory from './Components/Adminerrorhistory';
+import Verifydocumentshistory from './Components/Verifydocumentshistory';
 
 
 function App() {
@@ -80,6 +81,8 @@ function App() {
         <Route path="/Addnotifications" element={<Admindashboard><Addnotifications /></Admindashboard>} />
         <Route path="/Adminrequest" element={<Admindashboard><Adminrequest /></Admindashboard>} />
         <Route path="/Adminerrorhistory" element={<Admindashboard><Adminerrorhistory /></Admindashboard>} />
+        <Route path="/Verifydocumentshistory" element={<Admindashboard><Verifydocumentshistory /></Admindashboard>} />
+
 
         <Route path="/Customerdashboard" element={<Customerdashboard />} />
         <Route path="/Cdashinner" element={<Customerdashboard><Cdashinner /></Customerdashboard>} />

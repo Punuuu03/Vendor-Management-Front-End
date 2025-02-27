@@ -101,11 +101,11 @@ const navigate = useNavigate();
       return;
     }
   
-    const { user_id } = selectedDocument;
+    const { user_id, application_id, name } = selectedDocument;
     const finalUserId = user_id || distributorId;
   
-    if (!finalUserId || !distributorId) {
-      Swal.fire("Error", "User ID or Distributor ID is missing", "error");
+    if (!finalUserId || !distributorId || !application_id || !name) {
+      Swal.fire("Error", "User ID, Distributor ID, Application ID, or Name is missing", "error");
       return;
     }
   
@@ -114,6 +114,8 @@ const navigate = useNavigate();
     formData.append("document_id", documentId.toString());
     formData.append("user_id", finalUserId.toString());
     formData.append("distributor_id", distributorId.toString());
+    formData.append("application_id", application_id.toString());
+    formData.append("name", name.toString());
   
     try {
       // Upload the certificate
@@ -140,6 +142,7 @@ const navigate = useNavigate();
     }
   };
   
+  
   return (
     <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       <div className="w-full p-6 shadow-lg">
@@ -149,7 +152,7 @@ const navigate = useNavigate();
         <table className="w-full border-collapse border border-gray-300">
           <thead className="bg-gray-300">
             <tr>
-              {["Application Id", "Category", "Subcategory",  "Verification", "Actions","Take","View", "Upload Certificate"].map((header, index) => (
+              {["Application Id", "Category", "Subcategory",  "Verification", "Actions","View", "Upload Certificate"].map((header, index) => (
                 <th key={index} className="border p-2 text-center">{header}</th>
               ))}
             </tr>
@@ -184,14 +187,14 @@ const navigate = useNavigate();
                     {doc.status}
                   </span>
                 </td>
-                <td className="p-4 flex flex-col items-center space-y-2">
+                {/* <td className="p-4 flex flex-col items-center space-y-2">
                   <button onClick={() => handleUpdateStatus(doc.document_id, "Rejected")} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
                     Reject
                   </button>
                   {/* <button onClick={() => handleUpdateStatus(doc.document_id, "Uploaded")} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
                     Uploaded
                   </button> */}
-                </td>
+                {/* </td> */}
 
                 <td className="border p-2 text-center">
                                     <button

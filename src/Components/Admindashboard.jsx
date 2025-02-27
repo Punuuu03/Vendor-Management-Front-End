@@ -47,6 +47,7 @@ const Sidebar = ({ onNavigate }) => {
         { icon: <FaShapes />, label: "Field Names", path: "/Addfieldname" }, // Shapes Icon (for fields)
         { icon: <FaExchangeAlt />, label: "Transaction", path: "/transactions" }, // Exchange Icon
         { icon: <FaCheckCircle />, label: "Verify Documents", path: "/Verifydocuments" }, // Check Circle (Verification)
+        { icon: <FaCheckCircle />, label: "Verify Documents History", path: "/Verifydocumentshistory" },
       ].map((item, index) => (
         <li
           key={index}

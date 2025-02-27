@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaRegFileAlt, FaFileInvoice,FaCheck, FaTimes } from "react-icons/fa";
-import { useNavigate } from "react-router-dom"; 
+import { FaRegFileAlt,FaDownload, FaFileInvoice, FaCheck, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const VerifyDocuments = () => {
-  // const [documents, setDocuments] = useState([]);
   const [distributors, setDistributors] = useState([]);
   const [certificates, setCertificates] = useState([]);
-  // const [statusFilter, setStatusFilter] = useState(""); // State for status filter
-  // const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-const [statusFilter, setStatusFilter] = useState('');
-const [documents, setDocuments] = useState([]); // Should be an array
-const [users, setUsers] = useState([]); 
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [documents, setDocuments] = useState([]);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     axios
@@ -23,7 +19,7 @@ const [users, setUsers] = useState([]);
         const sortedDocuments = response.data.documents.sort(
           (a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at)
         );
-        setDocuments(sortedDocuments); // Ensure documents are sorted from newest to oldest
+        setDocuments(sortedDocuments);
       })
       .catch((error) => console.error("Error fetching documents:", error));
 
@@ -32,96 +28,65 @@ const [users, setUsers] = useState([]);
       .then((response) => setDistributors(response.data))
       .catch((error) => console.error("Error fetching distributors:", error));
 
-
-      
     axios
       .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates")
       .then((response) => setCertificates(response.data))
       .catch((error) => console.error("Error fetching certificates:", error));
 
-
-
-      axios
+    axios
       .get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register")
       .then((response) => setUsers(response.data))
       .catch((error) => console.error("Error fetching users:", error));
   }, []);
 
-
-  // Function to handle status filter change
   const handleStatusFilterChange = (e) => {
     setStatusFilter(e.target.value);
   };
 
-  // Function to handle search query change
   const handleSearchQueryChange = (e) => {
-    setSearchQuery(e.target.value); // No need to convert to lowercase here
+    setSearchQuery(e.target.value);
   };
-  
 
-  // Filter documents based on selected status
   const filteredDocuments = documents
-  .filter((doc) => doc.status !== "Completed" && doc.status !== "Rejected") 
-  .filter((doc) =>
-    statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
-  )
-  .filter((doc) => {
-    if (!searchQuery) return true;
+    .filter((doc) => doc.status === "Completed" || doc.status === "Rejected") // Only Rejected or Completed
+    .filter((doc) =>
+      statusFilter ? doc.status?.toLowerCase() === statusFilter.toLowerCase() : true
+    )
+    .filter((doc) => {
+      if (!searchQuery) return true;
 
-    const lowerQuery = searchQuery.toLowerCase();
+      const lowerQuery = searchQuery.toLowerCase();
 
-    return (
-      doc.document_id?.toString().toLowerCase().includes(lowerQuery) ||
-      doc.name?.toLowerCase().includes(lowerQuery) ||
-      doc.email?.toLowerCase().includes(lowerQuery) ||
-      doc.phone?.toString().toLowerCase().includes(lowerQuery) ||
-      doc.category_name?.toLowerCase().includes(lowerQuery) ||
-      doc.subcategory_name?.toLowerCase().includes(lowerQuery) ||
-      doc.address?.toLowerCase().includes(lowerQuery)
-    );
-  });
-
-
-  const handleUpdateStatus = async (documentId, newStatus) => {
-    try {
-      await axios.put(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/documents/update-status/${documentId}`, {
-        status: newStatus,
-      });
-      setDocuments((prev) =>
-        prev.map((doc) =>
-          doc.document_id === documentId ? { ...doc, status: newStatus } : doc
-        )
+      return (
+        doc.document_id?.toString().toLowerCase().includes(lowerQuery) ||
+        doc.name?.toLowerCase().includes(lowerQuery) ||
+        doc.email?.toLowerCase().includes(lowerQuery) ||
+        doc.phone?.toString().toLowerCase().includes(lowerQuery) ||
+        doc.category_name?.toLowerCase().includes(lowerQuery) ||
+        doc.subcategory_name?.toLowerCase().includes(lowerQuery) ||
+        doc.address?.toLowerCase().includes(lowerQuery)
       );
-    } catch (error) {
-      console.error("Error updating status:", error);
-      alert("Failed to update status.");
-    }
-  };
+    });
 
-  // Function to get distributor name by ID
   const getDistributorName = (distributorId) => {
     const distributor = users.find((user) => Number(user.user_id) === Number(distributorId));
     return distributor ? distributor.name : "";
   };
-  
-
 
   const handleViewInvoice = (documentId, categoryId, subcategoryId) => {
     navigate(`/Invoice/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
-
   const handleView = (documentId, categoryId, subcategoryId) => {
     navigate(`/View/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
-  
   const getCertificateByDocumentId = (documentId) => {
-    const matchedCertificate = certificates.find(
-      (cert) => cert.document_id === documentId
-    );
+    const matchedCertificate = certificates.find((cert) => cert.document_id === documentId);
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
+
+
 
   const handleViewCertificate = async (documentId) => {
     const certificateId = getCertificateByDocumentId(documentId);
@@ -143,19 +108,36 @@ const [users, setUsers] = useState([]);
   };
 
 
-
+  const handleDownloadCertificate = async (documentId, name) => {
+    try {
+      const response = await axios.get(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        {
+          responseType: "blob", // Important to handle file downloads
+        }
+      );
   
+      // Create a downloadable link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${name}.zip`); // Set ZIP file name based on user name
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading certificate:", error);
+      alert("Failed to download certificate.");
+    }
+  };
 
   return (
     <div className="ml-[295px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-      <div className="w-full p-6 bg-white rounded-lg shadow-lg"> {/* White container with shadow */}
-        {/* Header and Filters in the Same Row */}
+      <div className="w-full p-6 bg-white rounded-lg shadow-lg">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800">Verify Documents</h2>
-  
-          {/* Flex container for Status Filter and Search Bar */}
+
           <div className="flex items-center space-x-4">
-            {/* Status Filter Dropdown */}
             <div>
               <label htmlFor="statusFilter" className="mr-2">Filter by Status:</label>
               <select
@@ -170,8 +152,7 @@ const [users, setUsers] = useState([]);
                 <option value="Completed">Completed</option>
               </select>
             </div>
-  
-            {/* Search Bar */}
+
             <input
               type="text"
               placeholder="Search documents..."
@@ -181,11 +162,10 @@ const [users, setUsers] = useState([]);
             />
           </div>
         </div>
-  
-        {/* Table Container */}
+
         <div className="table-container border border-gray-300 rounded-lg shadow-md">
           <table className="table border-collapse border border-gray-300 min-w-full">
-            <thead className="bg-gray-300 ">
+            <thead className="bg-gray-300">
               <tr>
                 <th className="border p-2 text-center font-bold">Sr No.</th>
                 <th className="border p-2 text-center font-bold">Application Id</th>
@@ -193,14 +173,12 @@ const [users, setUsers] = useState([]);
                 <th className="border p-2 font-bold">Subcategory</th>
                 <th className="border p-2 font-bold">Name</th>
                 <th className="border p-2 font-bold">Email</th>
-                {/* <th className="border p-2 font-bold">Phone</th> */}
-
                 <th className="border p-2 font-bold">Assign Distributor</th>
                 <th className="border p-2 font-bold">Verification</th>
-                <th className="border p-2 font-bold">Completed</th>
                 <th className="border p-2 font-bold">Action</th>
                 <th className="border p-2 font-bold">View</th>
                 <th className="border p-2 font-bold">Certificate</th>
+                <th className="border p-2 font-bold">Download Certificate</th>
               </tr>
             </thead>
             <tbody>
@@ -215,63 +193,46 @@ const [users, setUsers] = useState([]);
                   <td className="border p-2">{doc.subcategory_name}</td>
                   <td className="border p-2">{doc.name}</td>
                   <td className="border p-2 break-words">{doc.email}</td>
-                  {/* <td className="border p-2">{doc.phone}</td> */}
-                  <td className="border p-2">{getDistributorName(doc.distributor_id)}</td> 
+                  <td className="border p-2">{getDistributorName(doc.distributor_id)}</td>
 
                   <td className="border p-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-white text-sm ${
-                        doc.status === "Approved"
-                          ? "bg-green-500"
-                          : doc.status === "Rejected"
-                          ? "bg-red-500"
-                          : "bg-blue-500"
-                      }`}
-                    >
+                    <span className={`px-3 py-1 rounded-full text-white text-sm ${doc.status === "Completed" ? "bg-green-500" : "bg-red-500"}`}>
                       {doc.status}
                     </span>
                   </td>
-  
-                  <td className="border p-2">
-  <button
-    onClick={() => handleUpdateStatus(doc.document_id, "Completed")}
-    className="bg-blue-900 rounded flex justify-center items-center hover:bg-blue-600 px-3 py-1 text-white text-sm"
-  >
-    <FaCheck className="text-white" />
-  </button>
-</td>
 
-  
                   <td className="border p-2 text-center">
-                    <button
-                      onClick={() => handleViewInvoice(doc.document_id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-red-600 transition"
-                    >
+                    <button onClick={() => handleViewInvoice(doc.document_id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">
                       <FaFileInvoice className="mr-1" /> Action
                     </button>
                   </td>
-  
+
                   <td className="border p-2 text-center">
-                    <button
-                      onClick={() => handleView(doc.document_id)}
-                      className="bg-indigo-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-indigo-600 transition"
-                    >
+                    <button onClick={() => handleView(doc.document_id)} className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition">
                       <FaFileInvoice className="mr-1" /> View
                     </button>
                   </td>
-  
-                  <td className="border p-2">
-                    {getCertificateByDocumentId(doc.document_id) ? (
-                      <button
-                        onClick={() => handleViewCertificate(doc.document_id)}
-                        className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
-                      >
-                        Certificate
-                      </button>
-                    ) : (
-                      <span>No Certificate</span>
-                    )}
-                  </td>
+
+
+                 
+
+
+                  <td className="border p-2">{getCertificateByDocumentId(doc.document_id) ? <button onClick={() => handleViewCertificate(doc.document_id)} className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition">Certificate</button> : <span>No Certificate</span>}</td>
+                
+                
+                  <td className="border p-2 text-center">
+  {getCertificateByDocumentId(doc.document_id) ? (
+    <button
+      onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
+      className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
+    >
+      <FaDownload className="mr-1" /> Download
+    </button>
+  ) : (
+    <span className="text-gray-500 text-center">Not Available</span>
+  )}
+</td>
+                
                 </tr>
               ))}
             </tbody>
@@ -280,5 +241,6 @@ const [users, setUsers] = useState([]);
       </div>
     </div>
   );
-};  
+};
+
 export default VerifyDocuments;

@@ -96,19 +96,86 @@ const ErrorRequests = () => {
   };
 
   // Reject request
-  const handleRejectStatus = async (requestId) => {
-    try {
-      console.log(`Rejecting request with Request ID: ${requestId}`);
-      await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
-        request_status: "Distributor Rejected",
-      });
-      fetchErrorRequests(distributorId);
-      Swal.fire("Updated!", "Request has been rejected.", "success");
-    } catch (error) {
-      console.error("Error updating request status:", error);
-      Swal.fire("Error", "Failed to reject request.", "error");
+  // const handleRejectStatus = async (requestId) => {
+  //   try {
+  //     console.log(`Rejecting request with Request ID: ${requestId}`);
+  //     await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
+  //       request_status: "Distributor Rejected",
+  //     });
+  //     fetchErrorRequests(distributorId);
+  //     Swal.fire("Updated!", "Request has been rejected.", "success");
+  //   } catch (error) {
+  //     console.error("Error updating request status:", error);
+  //     Swal.fire("Error", "Failed to reject request.", "error");
+  //   }
+  // };
+
+
+
+const handleRejectStatus = async (requestId) => {
+    const { value: rejectionReason } = await Swal.fire({
+        title: "Enter Rejection Reason",
+        input: "text",
+        inputPlaceholder: "Type your reason here...",
+        showCancelButton: true,
+        confirmButtonText: "Reject",
+        cancelButtonText: "Cancel",
+        inputValidator: (value) => {
+            if (!value.trim()) {
+                return "Rejection reason is required!";
+            }
+        }
+    });
+
+    // Ensure rejection reason is captured correctly
+    if (!rejectionReason || rejectionReason.trim() === "") {
+        console.error("❌ No rejection reason provided.");
+        return;
     }
-  };
+
+    try {
+        console.log(`🔹 Rejecting request ID: ${requestId} with reason: ${rejectionReason}`);
+
+        const response = await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
+            request_status: "Distributor Rejected",
+            rejectionReason: rejectionReason.trim(), // Ensure it's not undefined
+        });
+
+        console.log("✅ API Response:", response.data);
+
+        fetchErrorRequests(distributorId);
+
+        Swal.fire({
+            icon: "success",
+            title: "Updated!",
+            text: "Request has been rejected successfully.",
+            confirmButtonText: "OK",
+        });
+
+    } catch (error) {
+        console.error("❌ Error updating request status:", error);
+
+        if (error.response) {
+            console.error("🛑 Server Response:", error.response.data);
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: `Failed to reject request: ${error.response.data.message || "Unknown error"}`,
+                confirmButtonText: "OK",
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to reject request. Please try again later.",
+                confirmButtonText: "OK",
+            });
+        }
+    }
+};
+
+
+
 
   // Handle file selection
   const handleFileChange = (event, documentId) => {
@@ -225,7 +292,7 @@ const ErrorRequests = () => {
                     <td className="border px-4 py-2 text-center">{new Date(request.request_date).toLocaleString()}</td>
                     <td className="border px-4 py-2 text-center">
                       <button onClick={() => handleRejectStatus(request.request_id)} className="bg-red-500 text-white px-3 py-1 rounded">
-                        Rejected
+                       Distributor Rejected
                       </button>
                     </td>
                     <td className="border px-4 py-2 text-center">

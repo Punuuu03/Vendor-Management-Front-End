@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileAlt, FaExclamationTriangle } from "react-icons/fa";
+import { FaFileAlt, FaDownload,FaExclamationTriangle } from "react-icons/fa";
 import jwtDecode from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
@@ -75,7 +75,30 @@ const CustomerHistory = () => {
   };
 
 
-  const handleGenerateErrorRequest = (documentId,applicationId, distributorId, userId, categoryId, subcategoryId) => {
+  const handleDownloadCertificate = async (documentId, name) => {
+    try {
+      const response = await axios.get(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        {
+          responseType: "blob", // Important to handle file downloads
+        }
+      );
+  
+      // Create a downloadable link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${name}.zip`); // Set ZIP file name based on user name
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading certificate:", error);
+      alert("Failed to download certificate.");
+    }
+  };
+
+  const handleGenerateErrorRequest = (documentId,applicationId, distributorId, userId, categoryId, subcategoryId,name,email) => {
     navigate(`/Adderrorrequest`, {
       state: {
         documentId,
@@ -84,6 +107,8 @@ const CustomerHistory = () => {
         userId,
         categoryId,
         subcategoryId,
+        name,
+        email,
       },
     });
   };
@@ -126,6 +151,8 @@ const CustomerHistory = () => {
                   <th className="border p-3">Documents</th>
                   <th className="border p-3">Verification</th>
                   <th className="border p-3">Certificate</th>
+                  <th className="border p-3">Download Certificate</th>
+
                   <th className="border p-2 font-bold">Generate Error Request</th>
                 </tr>
               </thead>
@@ -192,6 +219,21 @@ const CustomerHistory = () => {
                       </td>
 
 
+
+                      <td className="border p-2 text-center">
+  {getCertificateByDocumentId(doc.document_id) ? (
+    <button
+      onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
+      className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
+    >
+      <FaDownload className="mr-1" /> Download
+    </button>
+  ) : (
+    <span className="text-gray-500 text-center">Not Available</span>
+  )}
+</td>
+
+
                       <td className="border p-2 text-center">
                       <button
                         onClick={() =>
@@ -201,7 +243,9 @@ const CustomerHistory = () => {
                             doc.distributor_id,
                             doc.user_id,
                             doc.category_id,
-                            doc.subcategory_id
+                            doc.subcategory_id,
+                            doc.name,
+                            doc.email,
                           )
                         }
                         className="bg-yellow-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-yellow-600 transition"

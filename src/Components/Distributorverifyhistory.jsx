@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaFileInvoice } from "react-icons/fa"; // Document icon
+import { FaFileInvoice,FaDownload } from "react-icons/fa"; // Document icon
 import jwtDecode from "jwt-decode"; // JWT decoder
 import Swal from "sweetalert2"; // Popup notifications
 import { useNavigate } from "react-router-dom"; 
@@ -104,6 +104,35 @@ const VerifyDocuments = () => {
     navigate(`/Distributorview/${documentId}`, { state: { categoryId, subcategoryId } });
   };
 
+
+
+  
+  const handleDownloadCertificate = async (documentId, name) => {
+    try {
+      const response = await axios.get(
+        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/download-certificate/${documentId}`,
+        {
+          responseType: "blob", // Important to handle file downloads
+        }
+      );
+  
+      // Create a downloadable link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `${name}.zip`); // Set ZIP file name based on user name
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading certificate:", error);
+      alert("Failed to download certificate.");
+    }
+  };
+
+
+
+
   return (
     <div className="ml-[300px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
       <div className="w-full p-6 shadow-lg">
@@ -113,7 +142,7 @@ const VerifyDocuments = () => {
         <table className="w-full border-collapse border border-gray-300">
           <thead className="bg-gray-300">
             <tr>
-              {["Application Id", "Category", "Subcategory", "Verification", "Actions", "View", "Certificate"].map((header, index) => (
+              {["Application Id", "Category", "Subcategory", "Verification", "Actions", "View", "Certificate","Download Certificate"].map((header, index) => (
                 <th key={index} className="border p-2 text-center">{header}</th>
               ))}
             </tr>
@@ -168,7 +197,23 @@ const VerifyDocuments = () => {
                   ) : (
                     <span className="text-gray-500">No Certificate</span>
                   )}
-                </td>
+                </td> 
+                
+                <td className="border p-2 text-center">
+  {getCertificateByDocumentId(doc.document_id) ? (
+    <button
+      onClick={() => handleDownloadCertificate(doc.document_id, doc.name)}
+      className="bg-green-500 text-white px-3 py-1 rounded flex justify-center items-center hover:bg-green-600 transition"
+    >
+      <FaDownload className="mr-1" /> Download
+    </button>
+  ) : (
+    <span className="text-gray-500 text-center">Not Available</span>
+  )}
+</td>
+
+
+
               </tr>
             ))}
           </tbody>

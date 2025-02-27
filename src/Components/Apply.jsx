@@ -140,7 +140,7 @@ const Apply = () => {
     if (!formData.name) newErrors.name = "Full Name is required.";
     if (!formData.email) newErrors.email = "Email is required.";
     if (!formData.phone) newErrors.phone = "Phone Number is required.";
-    if (!formData.address) newErrors.address = "Address is required.";
+    // if (!formData.address) newErrors.address = "Address is required.";
 
     fieldNames.forEach((field) => {
       if (!formData.document_fields[field]) {

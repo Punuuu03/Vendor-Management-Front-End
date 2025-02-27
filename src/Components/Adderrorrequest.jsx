@@ -12,6 +12,8 @@ const AddErrorRequestPage = () => {
     userId,
     categoryId,
     subcategoryId,
+    name,
+    email,
   } = location.state || {}; 
 
   const [requestDescription, setRequestDescription] = useState("");
@@ -49,6 +51,8 @@ const AddErrorRequestPage = () => {
     console.log("👤 User ID:", userId);
     console.log("📑 Category ID:", categoryId);
     console.log("📂 Subcategory ID:", subcategoryId);
+    console.log("📂 Name:", name);
+    console.log("📂 Email:", email);
 
     setUploading(true);
 
@@ -61,6 +65,8 @@ const AddErrorRequestPage = () => {
     formData.append("user_id", String(userId));
     formData.append("category_id", String(categoryId));
     formData.append("subcategory_id", String(subcategoryId));
+    formData.append("request_name", String(name));
+    formData.append("request_email", String(email));
 
     try {
       const response = await axios.post(

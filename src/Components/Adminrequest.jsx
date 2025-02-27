@@ -12,7 +12,6 @@ const ErrorRequests = () => {
     fetchCertificates();
   }, []);
 
-  // Fetch error requests
   const fetchErrorRequests = async () => {
     try {
       const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors");
@@ -22,7 +21,6 @@ const ErrorRequests = () => {
     }
   };
 
-  // Fetch certificates
   const fetchCertificates = async () => {
     try {
       const response = await axios.get("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/certificates");
@@ -32,7 +30,6 @@ const ErrorRequests = () => {
     }
   };
 
-  // Get certificate by document ID
   const getCertificateByDocumentId = (documentId) => {
     const matchedCertificate = certificates.find(
       (cert) => cert.document_id === documentId
@@ -40,7 +37,6 @@ const ErrorRequests = () => {
     return matchedCertificate ? matchedCertificate.certificate_id : null;
   };
 
-  // View certificate
   const handleViewCertificate = async (documentId) => {
     const certificateId = getCertificateByDocumentId(documentId);
     if (!certificateId) {
@@ -60,30 +56,60 @@ const ErrorRequests = () => {
     }
   };
 
-  // Handle status update
   const handleUpdateStatus = async (requestId, newStatus) => {
-    try {
-      await axios.patch(
-        `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`,
-        { request_status: newStatus }
-      );
-      fetchErrorRequests(); // Refresh the list after updating
+    let rejectionReason = "";
 
-      // Show success message
-      Swal.fire({
-        title: "Updated!",
-        text: "Status has been updated successfully.",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
+    if (newStatus === "Rejected") {
+      const { value } = await Swal.fire({
+        title: "Enter Rejection Reason",
+        input: "text",
+        inputPlaceholder: "Type your reason here...",
+        showCancelButton: true,
+        confirmButtonText: "Reject",
+        cancelButtonText: "Cancel",
+        inputValidator: (value) => {
+          if (!value.trim()) {
+            return "Rejection reason is required!";
+          }
+        },
+      });
+
+      if (!value) {
+        return; // If user cancels, stop further execution
+      }
+
+      rejectionReason = value.trim();
+    }
+
+    // ✅ Instantly update UI before API response
+    setErrorRequests((prevRequests) =>
+      prevRequests.map((req) =>
+        req.request_id === requestId ? { ...req, request_status: newStatus } : req
+      )
+    );
+
+    Swal.fire({
+      icon: "success",
+      title: "Updated!",
+      text: "Status has been updated successfully.",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    try {
+      await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/request-errors/update-status/${requestId}`, {
+        request_status: newStatus,
+        rejectionReason,
       });
     } catch (error) {
       console.error("Error updating request status:", error);
       Swal.fire("Error", "Failed to update status.", "error");
+
+      // ❌ If API fails, revert status change
+      fetchErrorRequests();
     }
   };
 
-  // Filter requests based on search term and exclude "Completed" status
   const filteredRequests = errorRequests
     .filter((request) => request.request_status !== "Completed")
     .filter((request) =>
@@ -97,7 +123,6 @@ const ErrorRequests = () => {
   return (
     <div className="ml-[300px] p-6">
       <div className="bg-white shadow-md p-4 rounded-md">
-        {/* Header Section */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">Error Requests</h1>
           <input
@@ -109,7 +134,6 @@ const ErrorRequests = () => {
           />
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300">
             <thead className="bg-gray-200">
@@ -187,6 +211,8 @@ const ErrorRequests = () => {
                         <option value="Pending">Pending</option>
                         <option value="Approved">Approved</option>
                         <option value="Rejected">Rejected</option>
+                        <option value="Completed">Completed</option>
+                        
                       </select>
                     </td>
                   </tr>

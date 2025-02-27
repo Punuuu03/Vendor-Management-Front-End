@@ -281,7 +281,7 @@ const handleDownloadAllDocuments = async () => {
       { label: "Email", value: documentData.email },
       { label: "Phone", value: documentData.phone },
       { label: "Status", value: documentData.status },
-      { label: "Address", value: documentData.address },
+      // { label: "Address", value: documentData.address },
       { label: "Distributor", value: documentData.distributor_id || 'Not Assigned' }
     ].reduce((rows, field, index, array) => {
       if (index % 2 === 0) {
