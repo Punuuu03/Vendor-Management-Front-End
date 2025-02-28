@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import "../index.css"; // Ensure Tailwind & CSS are imported
+// import "../index.css"; // Ensure Tailwind & CSS are imported
+import jwtDecode from "jwt-decode"; 
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -65,25 +66,58 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
+  
       const data = await response.json();
-      
+  
       if (!response.ok) {
         throw new Error(data.message || "Login failed");
       }
-
+  
+      // Store token & role
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-
+  
+      // Decode JWT token to check user details
+      const decodedToken = jwtDecode(data.token);
+      console.log("Decoded Token:", decodedToken);
+  
+      // Extract user_id and role
+      const userId = decodedToken.user_id; // Ensure this key matches your backend token structure
+      const userRole = data.role;
+  
+      // Check if phone, address, or user_documents array is empty
+      if (!decodedToken.phone || !decodedToken.address || !Array.isArray(decodedToken.user_documents) || decodedToken.user_documents.length === 0) {
+        Swal.fire({
+          title: "Complete Your Profile",
+          text: "Please add your phone, address, and upload documents.",
+          icon: "info",
+          confirmButtonColor: "#00234E",
+        }).then(() => {
+          navigate(`/Registerdocument/${userId}/${userRole}`); // Pass user_id & role to the next page
+        });
+        return;
+      }
+  
+      // Role-based redirection
       Swal.fire({
         title: "Login Successful!",
         text: "Redirecting...",
         icon: "success",
         confirmButtonColor: "#00234E",
       }).then(() => {
-        if (data.role === "Admin") navigate("/Adashinner");
-        else if (data.role === "Customer") navigate("/Cdashinner");
-        else if (data.role === "Distributor") navigate("/Ddashinner");
-        else Swal.fire("Error", "Invalid role received", "error");
+        switch (data.role) {
+          case "Admin":
+            navigate("/Adashinner");
+            break;
+          case "Customer":
+            navigate("/Cdashinner");
+            break;
+          case "Distributor":
+            navigate("/Ddashinner");
+            break;
+          default:
+            Swal.fire("Error", "Invalid role received", "error");
+        }
       });
     } catch (error) {
       Swal.fire({
@@ -94,7 +128,6 @@ const Login = () => {
       });
     }
   };
-
   return (
     <div className="relative flex justify-center items-center min-h-screen">
       {/* Background Image with Overlay */}

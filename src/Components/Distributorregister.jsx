@@ -9,19 +9,12 @@ const Register = () => {
         name: "",
         email: "",
         password: "",
-        phone: "",
     });
 
     const navigate = useNavigate();
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        if (name === "phone") {
-            if (!/^[0-9]*$/.test(value)) return; // Prevent non-numeric input
-            if (value.length > 10) return; // Prevent more than 10 digits
-        }
-
         setFormData({ ...formData, [name]: value });
     };
 
@@ -31,7 +24,7 @@ const Register = () => {
         const userData = {
             ...formData,
             role: "Distributor", // Automatically set role as Distributor
-            user_login_status: "Approve", // Default status for Distributors
+            user_login_status: "Active", // Default status for Distributors
         };
 
         try {
@@ -70,8 +63,6 @@ const Register = () => {
         }
     };
 
-
-
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30">
             <div className="bg-white p-6 rounded-lg shadow-lg w-[600px]">
@@ -103,17 +94,6 @@ const Register = () => {
                         onChange={handleChange}
                         value={formData.password}
                         required
-                    />
-                    <input
-                        type="text"
-                        name="phone"
-                        placeholder="Phone Number"
-                        className="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={handleChange}
-                        value={formData.phone}
-                        required
-                        pattern="\d{10}"
-                        maxLength="10"
                     />
                     <button
                         type="submit"

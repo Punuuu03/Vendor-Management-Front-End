@@ -41,6 +41,7 @@ const Sidebar = ({ onNavigate }) => {
         { icon: <FaExclamationTriangle />, label: "Error Request", path: "/Adminrequest" }, // Error Icon
         { icon: <FaHistory />, label: "Error Request History", path: "/Adminerrorhistory" }, // History Icon
         { icon: <FaUserShield />, label: "Distributor Credentials", path: "/distributorlist" }, // Shield User Icon
+        { icon: <FaUserShield />, label: "Customer Credentials", path: "/Customerlist" },
         { icon: <FaBell />, label: "Notifications", path: "/Addnotifications" }, // Notification Bell
         { icon: <FaFileAlt />, label: "Required Documents", path: "/requireddocuments" }, // Document Icon
         // { icon: <FaFileUpload />, label: "Add Services", path: "/documenttable" }, // Upload File Icon

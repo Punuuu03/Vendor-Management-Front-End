@@ -27,7 +27,7 @@ import Distributorverify from './Components/Distributorverify';
 import Customerapply from './Components/Customerapply';
 // import Custsidebar from "./Components/Customerdashboard";
 import Cdashinner from "./Components/Cdashinner";
-import Process from "./Components/process";
+
 import Addfieldname from './Components/Addfieldname';
 import Recentapplications from "./Components/Recentapplications";
 import Dlistpage from './Components/Dlistpage';
@@ -53,7 +53,8 @@ import Customerinvoice from './Components/Customerinvoice';
 import Customerview from './Components/Customerview';
 import Adminerrorhistory from './Components/Adminerrorhistory';
 import Verifydocumentshistory from './Components/Verifydocumentshistory';
-
+import Registerdocument from './Components/Registerdocument';
+import Customerlist from './Components/Customerlist';
 
 function App() {
   return (
@@ -61,12 +62,14 @@ function App() {
       <Routes>
         <Route path="/Registration" element={<Registration />} />
         <Route path="/Invoice/:documentId" element={<Invoice />} />
+        <Route path="/Registerdocument/:id/:role" element={<Registerdocument />} />
+
         <Route path="/" element={<Login />} />
         <Route path="/View/:documentId" element={<View />} />
         <Route path="/Admindashboard" element={<Admindashboard />} />
         <Route path="/Adashinner" element={<Admindashboard><Adashinner /></Admindashboard>} />
         <Route path="/ElistPage" element={<Admindashboard><ElistPage /></Admindashboard>} />
-
+        <Route path="/Customerlist" element={<Admindashboard><Customerlist/></Admindashboard>} />
         <Route path="/Addcategory" element={<Admindashboard><Addcategory /></Admindashboard>} />
         <Route path="/Addsubcategory" element={<Admindashboard><Addsubcategory /></Admindashboard>} />
         <Route path="/requireddocuments" element={<Admindashboard><RequiredDocuments /></Admindashboard>} />
@@ -95,7 +98,7 @@ function App() {
         <Route path="/Customererrorhistory" element={<Customerdashboard><Customererrorhistory /></Customerdashboard>} />
         <Route path="/Apply" element={<Customerdashboard><Apply /></Customerdashboard>} />
         <Route path="/Category" element={<Customerdashboard><Category /></Customerdashboard>} />
-        <Route path="/process" element={<Customerdashboard><Process /></Customerdashboard>} />
+        
         <Route path="/Clistpage" element={<Customerdashboard><Clistpage /></Customerdashboard>} />
         <Route path="/Customerinvoice/:documentId" element={<Customerinvoice />} />
         <Route path="/Customerview/:documentId" element={<Customerview />} />

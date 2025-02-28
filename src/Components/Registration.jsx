@@ -9,65 +9,62 @@ const Register = () => {
     name: "",
     email: "",
     password: "",
-    phone: "",
   });
 
   const [categories, setCategories] = useState([]);
   const [subcategories, setSubcategories] = useState({});
   const navigate = useNavigate();
 
-   useEffect(() => {
-      const fetchCategories = async () => {
-        try {
-          const response = await fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories");
-          if (!response.ok) {
-            throw new Error("Failed to fetch categories");
-          }
-          const data = await response.json();
-          setCategories(data);
-        } catch (error) {
-          console.error("Error fetching categories:", error);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/categories");
+        if (!response.ok) {
+          throw new Error("Failed to fetch categories");
         }
-      };
-      fetchCategories();
-    }, []);
-  
-    // Fetch subcategories when categories are available
-    useEffect(() => {
-      const fetchSubcategories = async () => {
-        try {
-          const subcategoryData = {};
-          for (const category of categories) {
-            const response = await fetch(
-              `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories/category/${category.category_id}`
-            );
-            if (response.ok) {
-              const data = await response.json();
-              subcategoryData[category.category_id] = data;
-            } else {
-              subcategoryData[category.category_id] = [];
-            }
-          }
-          setSubcategories(subcategoryData);
-        } catch (error) {
-          console.error("Error fetching subcategories:", error);
-        }
-      };
-  
-      if (categories.length > 0) {
-        fetchSubcategories();
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
       }
-    }, [categories]);
-  
+    };
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchSubcategories = async () => {
+      try {
+        const subcategoryData = {};
+        for (const category of categories) {
+          const response = await fetch(
+            `https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/subcategories/category/${category.category_id}`
+          );
+          if (response.ok) {
+            const data = await response.json();
+            subcategoryData[category.category_id] = data;
+          } else {
+            subcategoryData[category.category_id] = [];
+          }
+        }
+        setSubcategories(subcategoryData);
+      } catch (error) {
+        console.error("Error fetching subcategories:", error);
+      }
+    };
+
+    if (categories.length > 0) {
+      fetchSubcategories();
+    }
+  }, [categories]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "phone" && (!/^\d*$/.test(value) || value.length > 10)) return;
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const userData = { ...formData, role: "Customer", user_login_status: "Approve" };
+    const userData = { ...formData, role: "Customer", user_login_status: "Active" };
     try {
       const response = await fetch("https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/register", {
         method: "POST",
@@ -118,7 +115,6 @@ const Register = () => {
             <input type="text" name="name" placeholder="Name" className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onChange={handleChange} required />
             <input type="email" name="email" placeholder="Email" className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onChange={handleChange} required />
             <input type="password" name="password" placeholder="Password" className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onChange={handleChange} required />
-            <input type="text" name="phone" placeholder="Phone Number" className="w-full mb-3 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" onChange={handleChange} required pattern="\d{10}" maxLength="10" />
             <button type="submit" className="w-full bg-[#00234E] hover:bg-[#1e293b] text-white py-2 rounded">Register</button>
           </form>
           <p className="mt-4 text-center">Already have an account? <Link to="/" className="text-[#1e293b] hover:underline">Login</Link></p>

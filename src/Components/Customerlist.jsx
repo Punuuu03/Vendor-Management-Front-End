@@ -1,60 +1,65 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const DistributorList = () => {
-    const [distributors, setDistributors] = useState([]);
+const CustomerList = () => {
+    const [customers, setCustomers] = useState([]);
     const [editingId, setEditingId] = useState(null);
     const [updatedPassword, setUpdatedPassword] = useState(""); // State for password editing
-    const navigate = useNavigate(); // For navigation
 
-    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/distributors";
+    const apiUrl = "https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/customers";
 
     useEffect(() => {
-        fetchDistributors();
+        fetchCustomers();
     }, []);
 
-    const fetchDistributors = async () => {
+    const fetchCustomers = async () => {
         try {
             const response = await axios.get(apiUrl);
-            setDistributors(response.data);
+            setCustomers(response.data);
         } catch (error) {
-            console.error("Error fetching distributors:", error);
+            console.error("Error fetching customers:", error);
         }
     };
 
-    const handleEditDistributor = (id, password) => {
+    const handleEditCustomer = (id, password) => {
         setEditingId(id);
         setUpdatedPassword(password); // Set the password for editing
     };
 
-    const handleUpdateDistributor = async (id) => {
+    const handleUpdateCustomer = async (id) => {
         try {
             if (updatedPassword) {
                 await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/password/${id}`, { newPassword: updatedPassword });
             }
 
-            setDistributors(
-                distributors.map((distributor) =>
-                    distributor.user_id === id
-                        ? { ...distributor, password: updatedPassword }
-                        : distributor
+            setCustomers(
+                customers.map((customer) =>
+                    customer.user_id === id
+                        ? { ...customer, password: updatedPassword }
+                        : customer
                 )
             );
 
             setEditingId(null);
             setUpdatedPassword("");
 
-            Swal.fire("Updated", "Distributor password updated successfully!", "success");
+            Swal.fire({
+                title: "Updated",
+                text: "Customer password updated successfully!",
+                icon: "success",
+                timer: 1500, // Faster SweetAlert2 success message
+                showConfirmButton: false
+            });
         } catch (error) {
-            console.error("Error updating distributor:", error);
-            Swal.fire("Error", "Failed to update distributor password", "error");
+            console.error("Error updating customer:", error);
+            Swal.fire("Error", "Failed to update customer password", "error");
         }
     };
 
-    const handleDeleteDistributor = async (id) => {
+    const handleDeleteCustomer = async (id) => {
         const confirmDelete = await Swal.fire({
             title: "Enter Deletion Code",
             text: "Please enter the code to confirm deletion.",
@@ -77,16 +82,22 @@ const DistributorList = () => {
         });
 
         if (confirmDelete.isConfirmed) {
-            Swal.fire("Deleted!", "Distributor has been deleted.", "success");
+            Swal.fire({
+                title: "Deleted!",
+                text: "Customer has been deleted.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false
+            });
 
             try {
                 await axios.delete(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/delete/${id}`);
-                setDistributors((prevDistributors) => 
-                    prevDistributors.filter((distributor) => distributor.user_id !== id)
+                setCustomers((prevCustomers) => 
+                    prevCustomers.filter((customer) => customer.user_id !== id)
                 );
             } catch (error) {
-                console.error("Error deleting distributor:", error);
-                Swal.fire("Error", "Failed to delete distributor", "error");
+                console.error("Error deleting customer:", error);
+                Swal.fire("Error", "Failed to delete customer", "error");
             }
         }
     };
@@ -94,15 +105,21 @@ const DistributorList = () => {
     const handleStatusChange = async (id, newStatus) => {
         try {
             // Update the UI immediately
-            setDistributors((prevDistributors) =>
-                prevDistributors.map((distributor) =>
-                    distributor.user_id === id ? { ...distributor, user_login_status: newStatus } : distributor
+            setCustomers((prevCustomers) =>
+                prevCustomers.map((customer) =>
+                    customer.user_id === id ? { ...customer, user_login_status: newStatus } : customer
                 )
             );
 
             await axios.patch(`https://vm.q1prh3wrjc0aw.ap-south-1.cs.amazonlightsail.com/users/status/${id}`, { status: newStatus });
 
-            Swal.fire("Updated!", `Status changed to ${newStatus}`, "success");
+            Swal.fire({
+                title: "Updated!",
+                text: `Status changed to ${newStatus}`,
+                icon: "success",
+                timer: 1000, // Faster SweetAlert2 update
+                showConfirmButton: false
+            });
         } catch (error) {
             console.error("Error updating status:", error);
             Swal.fire("Error", "Failed to update status", "error");
@@ -111,17 +128,11 @@ const DistributorList = () => {
 
     return (
         <div className="ml-[330px] flex flex-col items-center min-h-screen p-10 bg-gray-100">
-            {/* Distributor List Section */}
+            {/* Customer List Section */}
             <div className="w-full max-w-9xl bg-white p-6 shadow-lg">
-                {/* Header and Add Distributor Button in the Same Row */}
+                {/* Header */}
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Distributor List</h2>
-                    <button
-                        onClick={() => navigate("/Distributorregister")}
-                        className="bg-[#00234E] text-white px-4 py-2 rounded flex items-center gap-2 hover:bg-blue-900 transition duration-200"
-                    >
-                        <FaPlus /> Add Distributor
-                    </button>
+                    <h2 className="text-xl font-bold text-gray-800">Customer List</h2>
                 </div>
 
                 {/* Scrollable Table Wrapper */}
@@ -139,17 +150,17 @@ const DistributorList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {distributors.length > 0 ? (
-                                distributors.map((distributor, index) => (
+                            {customers.length > 0 ? (
+                                customers.map((customer, index) => (
                                     <tr
-                                        key={distributor.user_id}
+                                        key={customer.user_id}
                                         className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
                                     >
-                                        <td className="p-3 border-r border-gray-400">{distributor.user_id}</td>
-                                        <td className="p-3 border-r border-gray-400">{distributor.name}</td>
-                                        <td className="p-3 border-r border-gray-400">{distributor.email}</td>
+                                        <td className="p-3 border-r border-gray-400">{customer.user_id}</td>
+                                        <td className="p-3 border-r border-gray-400">{customer.name}</td>
+                                        <td className="p-3 border-r border-gray-400">{customer.email}</td>
                                         <td className="p-3 border-r border-gray-400">
-                                            {editingId === distributor.user_id ? (
+                                            {editingId === customer.user_id ? (
                                                 <input
                                                     type="text"
                                                     value={updatedPassword}
@@ -157,63 +168,42 @@ const DistributorList = () => {
                                                     className="border border-gray-400 p-2 rounded w-full"
                                                 />
                                             ) : (
-                                                distributor.password // Show password directly
+                                                customer.password
                                             )}
                                         </td>
-                                        <td className="p-3 border-r border-gray-400">{distributor.user_login_status}</td>
+                                        <td className="p-3 border-r border-gray-400">{customer.user_login_status}</td>
                                         <td className="p-3 border-r border-gray-400 text-center">
                                             <button
-                                                onClick={() => handleStatusChange(distributor.user_id, "Active")}
-                                                className={`px-3 py-1 rounded text-white mr-2 ${
-                                                    distributor.user_login_status === "Active"
-                                                        ? "bg-green-500 cursor-default"
-                                                        : "bg-gray-500 hover:bg-green-600"
-                                                }`}
-                                                disabled={distributor.user_login_status === "Active"}
+                                                onClick={() => handleStatusChange(customer.user_id, "Active")}
+                                                className="px-3 py-1 rounded bg-green-500 text-white mr-2 hover:bg-green-600"
                                             >
                                                 Active
                                             </button>
                                             <button
-                                                onClick={() => handleStatusChange(distributor.user_id, "Inactive")}
-                                                className={`px-3 py-1 rounded text-white ${
-                                                    distributor.user_login_status === "Inactive"
-                                                        ? "bg-red-500 cursor-default"
-                                                        : "bg-gray-500 hover:bg-red-600"
-                                                }`}
-                                                disabled={distributor.user_login_status === "Inactive"}
+                                                onClick={() => handleStatusChange(customer.user_id, "Inactive")}
+                                                className="px-3 py-1 rounded bg-red-500 text-white hover:bg-red-600"
                                             >
                                                 Inactive
                                             </button>
                                         </td>
                                         <td className="p-3 text-center">
-                                            {editingId === distributor.user_id ? (
-                                                <button
-                                                    onClick={() => handleUpdateDistributor(distributor.user_id)}
-                                                    className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600"
-                                                >
+                                            {editingId === customer.user_id ? (
+                                                <button onClick={() => handleUpdateCustomer(customer.user_id)} className="bg-green-500 text-white px-3 py-1 rounded mr-2 hover:bg-green-600">
                                                     Save
                                                 </button>
                                             ) : (
-                                                <button
-                                                    onClick={() => handleEditDistributor(distributor.user_id, distributor.password)}
-                                                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600"
-                                                >
+                                                <button onClick={() => handleEditCustomer(customer.user_id, customer.password)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600">
                                                     <FaEdit />
                                                 </button>
                                             )}
-                                            <button
-                                                onClick={() => handleDeleteDistributor(distributor.user_id)}
-                                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                            >
+                                            <button onClick={() => handleDeleteCustomer(customer.user_id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
                                                 <FaTrash />
                                             </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
-                                <tr>
-                                    <td colSpan="6" className="p-3 text-center text-gray-500">No distributors found</td>
-                                </tr>
+                                <tr><td colSpan="6" className="p-3 text-center text-gray-500">No customers found</td></tr>
                             )}
                         </tbody>
                     </table>
@@ -223,4 +213,4 @@ const DistributorList = () => {
     );
 };
 
-export default DistributorList;
+export default CustomerList;
